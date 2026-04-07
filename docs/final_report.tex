@@ -4,6 +4,7 @@
 \usepackage{graphicx}
 \usepackage{subcaption}
 \usepackage{url}
+\usepackage{tikz}
 
 \title{When Does 2\,MiB Page Granularity Still Matter for vAttention?\\
 Empirical and Analytical Tail-Waste Characterization Across MHA, GQA, and MLA}
@@ -125,8 +126,11 @@ primary novel systems contributions.
 The important distinction from our original proposal is that 
 the runtime metric is a \emph{tail-slack percentage in mapped token capacity}, 
 not a fixed-byte-waste ratio across the whole cache. Let $C$ be 
-context length in tokens and $T$ the allocator's number of cached 
-tokens per 2\,MiB page. The exact fragmentation law used by the runtime is
+context length in tokens, let $T$ be the allocator's number of cached 
+tokens per 2\,MiB page, and let $B(C)=\lceil C/T\rceil$ be the number of
+blocks (pages) allocated for that request. Figure~\ref{fig:fragmentation-intuition}
+shows the resulting mapped capacity, used capacity, and tail slack. The exact
+fragmentation law used by the runtime is
 \begin{equation}
 F_{\text{exact}}(C)=100\cdot\frac{\lceil C/T \rceil T - C}{\lceil C/T \rceil T}.
 \end{equation}
@@ -143,6 +147,36 @@ F_{\text{avg}}(C)\approx 100\cdot\frac{T/2}{C+T/2}.
 In the paper figures, we use $F_{\text{worst}}$ as the main 
 overlay because it cleanly predicts the vertical scale of the 
 measured peaks, while $F_{\text{exact}}$ is used for side-by-side validation.
+
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[x=0.85cm,y=0.85cm]
+  \draw[fill=blue!55,draw=blue!70!black,thick] (0,0) rectangle (2.4,0.9);
+  \draw[fill=blue!55,draw=blue!70!black,thick] (2.8,0) rectangle (5.2,0.9);
+  \draw[fill=blue!55,draw=blue!70!black,thick] (5.6,0) rectangle (6.8,0.9);
+  \draw[fill=red!20,draw=red!55!black,thick] (6.8,0) rectangle (8.0,0.9);
+  \draw[draw=black!55,thick] (5.6,0) rectangle (8.0,0.9);
+
+  \node at (1.2,0.45) {\scriptsize page 1};
+  \node at (4.0,0.45) {\scriptsize page 2};
+  \node at (6.8,0.45) {\scriptsize last page};
+
+  \draw[thick] (0,-0.12) -- (8.0,-0.12);
+  \draw[thick] (0,-0.25) -- (0,0.02);
+  \draw[thick] (8.0,-0.25) -- (8.0,0.02);
+  \node[align=center] at (4.0,-0.65) {\scriptsize mapped capacity = $B(C)T$ tokens};
+
+  \draw[<->,thick] (0,1.25) -- (6.8,1.25);
+  \node at (3.4,1.55) {\scriptsize used tokens = $C$};
+
+  \draw[->,thick] (7.4,1.45) -- (7.4,0.95);
+  \node[align=left] at (9.7,1.2) {\scriptsize tail waste\\[-1pt]\scriptsize $= B(C)T - C$};
+\end{tikzpicture}
+\caption{Tail waste under paged KV allocation. A request with context length $C$
+maps $B(C)=\lceil C/T\rceil$ pages, each holding $T$ tokens, so the unused
+capacity in the final mapped page is $B(C)T-C$.}
+\label{fig:fragmentation-intuition}
+\end{figure}
 
 The architecture-dependent quantity is $T$:
 \begin{equation}
