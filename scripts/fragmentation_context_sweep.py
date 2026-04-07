@@ -19,53 +19,7 @@ HF_CACHE_DIR = Path(os.environ.get("HF_HOME", "/tmp/vattention-hf-home"))
 RUNNER_OUTPUT_ROOT = Path(
     os.environ.get("VATTN_FRAGMENTATION_SWEEP_OUTPUT_DIR", "/tmp/vattention-frag-sweep")
 )
-CONTEXT_LENGTHS = (
-    128,
-    512,
-    1024,
-    1536,
-    1792,
-    2048,
-    2560,
-    3072,
-    3584,
-    3840,
-    4096,
-    4352,
-    4608,
-    4864,
-    5120,
-    5632,
-    6144,
-    6656,
-    7168,
-    7680,
-    8192,
-    9216,
-    10240,
-    11264,
-    12288,
-    13312,
-    14336,
-    15360,
-    16384,
-    17408,
-    18432,
-    19456,
-    20480,
-    21504,
-    22528,
-    23552,
-    24576,
-    25600,
-    26624,
-    27648,
-    28672,
-    29696,
-    30720,
-    31744,
-    32768,
-)
+CONTEXT_LENGTHS = tuple(sorted({128, *range(512, 32768 + 1, 512)}))
 
 PROMPT_SEED_TEXT = (
     "This request is part of a deterministic context-length sweep for "
@@ -90,6 +44,12 @@ def parse_args() -> argparse.Namespace:
         "--fail-fast",
         action="store_true",
         help="Stop immediately after the first failed request.",
+    )
+    parser.add_argument(
+        "--inter-request-delay-seconds",
+        type=float,
+        default=0.0,
+        help="Optional cooldown delay to sleep after each request attempt.",
     )
     return parser.parse_args()
 
@@ -387,6 +347,12 @@ def main() -> int:
             )
             if args.fail_fast:
                 break
+
+        if args.inter_request_delay_seconds > 0 and request_index < len(context_lengths):
+            print(
+                f"  cooling down for {args.inter_request_delay_seconds:.1f}s before next request"
+            )
+            time.sleep(args.inter_request_delay_seconds)
 
     summary = summarize_attempts(attempts)
     summary["finished_at_utc"] = utc_timestamp()

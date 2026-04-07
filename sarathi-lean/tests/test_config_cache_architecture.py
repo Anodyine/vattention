@@ -1,8 +1,10 @@
 import importlib.util
+import os
 import sys
 import types
 import unittest
 from pathlib import Path
+from unittest import mock
 
 import torch
 
@@ -119,6 +121,56 @@ class ModelConfigCacheArchitectureTests(unittest.TestCase):
         self.assertEqual(model_config.get_mla_v_head_dim(), 128)
         self.assertEqual(model_config.get_mla_q_head_dim(), 192)
         self.assertEqual(model_config.get_mla_resident_cache_dim(), 576)
+
+    def test_model_config_applies_mistral_mla_conversion_before_cache_planning(self):
+        hf_config = types.SimpleNamespace(
+            model_type="mistral",
+            hidden_size=5120,
+            num_attention_heads=32,
+            num_key_value_heads=8,
+            num_hidden_layers=40,
+            head_dim=128,
+            max_position_embeddings=131072,
+            torch_dtype=torch.float16,
+            architectures=["MistralForCausalLM"],
+        )
+
+        with mock.patch.dict(
+            os.environ,
+            {
+                "VATTN_ENABLE_MISTRAL_MLA_CONVERSION": "1",
+                "VATTN_MISTRAL_MLA_KV_LORA_RANK": "128",
+                "VATTN_MISTRAL_MLA_QK_ROPE_HEAD_DIM": "64",
+            },
+            clear=False,
+        ), mock.patch.object(config_module, "get_config", return_value=hf_config):
+            model_config = ModelConfig(
+                model="mistralai/Mistral-Nemo-Base-2407",
+                tokenizer="mistralai/Mistral-Nemo-Base-2407",
+                tokenizer_mode="auto",
+                trust_remote_code=False,
+                download_dir=None,
+                load_format="dummy",
+                dtype="float16",
+                seed=0,
+                revision=None,
+                max_model_len=121000,
+                attention_backend="vattention",
+            )
+
+        parallel_config = ParallelConfig(
+            pipeline_parallel_size=1,
+            tensor_parallel_size=4,
+        )
+        layout = model_config.get_cache_layout(2 * 1024 * 1024, parallel_config)
+
+        self.assertEqual(
+            model_config.hf_config.architectures,
+            ["MistralMLAForCausalLM"],
+        )
+        self.assertEqual(model_config.get_cache_architecture(), CacheArchitecture.MLA)
+        self.assertEqual(layout.page_buffer_token_bytes, (128 + 64) * 2)
+        self.assertEqual(layout.tokens_per_page, 5461)
 
     def test_mla_attention_spec_packages_deepseek_dimensions(self):
         hf_config = types.SimpleNamespace(

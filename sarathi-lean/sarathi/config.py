@@ -1,6 +1,7 @@
 from abc import ABC
 from enum import Enum
 from dataclasses import dataclass
+import os
 from typing import Any, Dict, List, Optional, Tuple
 
 import torch
@@ -11,6 +12,42 @@ from sarathi.transformers_utils.config import get_config
 from sarathi.utils.base_int_enum import BaseIntEnum
 
 logger = init_logger(__name__)
+
+
+def maybe_apply_mistral_mla_conversion(hf_config: PretrainedConfig, model_name: str) -> None:
+    if (
+        os.environ.get("VATTN_ENABLE_MISTRAL_MLA_CONVERSION") != "1"
+        or getattr(hf_config, "model_type", None) != "mistral"
+    ):
+        return
+
+    hf_config.architectures = ["MistralMLAForCausalLM"]
+    hf_config.source_model_name = model_name
+    hf_config.q_lora_rank = None
+    hf_config.kv_lora_rank = int(
+        os.environ.get("VATTN_MISTRAL_MLA_KV_LORA_RANK", "128")
+    )
+    hf_config.qk_rope_head_dim = int(
+        os.environ.get("VATTN_MISTRAL_MLA_QK_ROPE_HEAD_DIM", "64")
+    )
+    head_dim = getattr(
+        hf_config,
+        "head_dim",
+        hf_config.hidden_size // hf_config.num_attention_heads,
+    )
+    default_qk_nope = max(0, head_dim - hf_config.qk_rope_head_dim)
+    hf_config.qk_nope_head_dim = int(
+        os.environ.get(
+            "VATTN_MISTRAL_MLA_QK_NOPE_HEAD_DIM",
+            str(default_qk_nope),
+        )
+    )
+    hf_config.v_head_dim = int(
+        os.environ.get(
+            "VATTN_MISTRAL_MLA_V_HEAD_DIM",
+            str(head_dim),
+        )
+    )
 
 
 class CacheArchitecture(Enum):
@@ -287,6 +324,7 @@ class ModelConfig:
         self.attention_backend = attention_backend
 
         self.hf_config = get_config(model, trust_remote_code, revision)
+        maybe_apply_mistral_mla_conversion(self.hf_config, model)
 
         # support fschat to load model which uses dynamic ntk (e.g Qwen)
         use_dynamic_ntk = getattr(self.hf_config, "use_dynamic_ntk", None)

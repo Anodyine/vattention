@@ -1,4 +1,5 @@
 import dataclasses
+import json
 import os
 from dataclasses import asdict, dataclass
 from typing import List, Optional, Tuple
@@ -20,6 +21,11 @@ from sarathi.config import (
 )
 
 VATTN_DEFAULT_PAGE_SIZE = 2 * 1024 * 1024
+
+
+def _write_json(path: str, payload) -> None:
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(payload, f, indent=2, sort_keys=True, default=str)
 
 
 @dataclass
@@ -161,6 +167,22 @@ class EngineArgs:
                 parallel_config,
                 megacache=megacache,
             ).tokens_per_page
+        else:
+            megacache = False
+
+        cache_layout = None
+        vattention_cache_spec = None
+        if page_size > 0:
+            cache_layout = model_config.get_cache_layout(
+                page_size,
+                parallel_config,
+                megacache=megacache,
+            )
+            vattention_cache_spec = model_config.get_vattention_cache_spec(
+                page_size,
+                parallel_config,
+                megacache=megacache,
+            )
 
         cache_config = CacheConfig(
             block_size=block_size,
@@ -187,6 +209,35 @@ class EngineArgs:
             keep_individual_batch_metrics=self.keep_individual_batch_metrics,
             model_num_layers=model_config.get_total_num_layers(),
         )
+
+        if self.write_metrics:
+            _write_json(
+                f"{self.output_dir}/hf_config.json",
+                model_config.hf_config.to_dict(),
+            )
+            if cache_layout is not None:
+                _write_json(
+                    f"{self.output_dir}/cache_layout.json",
+                    {
+                        "architecture": cache_layout.architecture.value,
+                        "megacache": cache_layout.megacache,
+                        "cached_token_bytes_per_layer": cache_layout.cached_token_bytes_per_layer,
+                        "cached_token_bytes_local": cache_layout.cached_token_bytes_local,
+                        "page_buffer_token_bytes": cache_layout.page_buffer_token_bytes,
+                        "tokens_per_page": cache_layout.tokens_per_page,
+                        "page_size": page_size,
+                        "tensor_parallel_size": parallel_config.tensor_parallel_size,
+                        "pipeline_parallel_size": parallel_config.pipeline_parallel_size,
+                        "model": model_config.model,
+                        "max_model_len": model_config.get_max_model_len(),
+                    },
+                )
+            if vattention_cache_spec is not None:
+                _write_json(
+                    f"{self.output_dir}/vattention_cache_spec.json",
+                    vattention_cache_spec.to_extension_dict(),
+                )
+
         return (
             model_config,
             cache_config,
