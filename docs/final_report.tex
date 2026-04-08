@@ -5,12 +5,17 @@
 \usepackage{subcaption}
 \usepackage{url}
 \usepackage{tikz}
+\usepackage{dblfloatfix}
+\usepackage{placeins}
+\setlength{\textfloatsep}{8pt plus 2pt minus 2pt}
+\setlength{\dbltextfloatsep}{8pt plus 2pt minus 2pt}
+\setlength{\floatsep}{6pt plus 2pt minus 2pt}
+\setlength{\dblfloatsep}{6pt plus 2pt minus 2pt}
 
-\title{When Does 2\,MiB Page Granularity Still Matter for vAttention?\\
-Empirical and Analytical Tail-Waste Characterization Across MHA, GQA, and MLA}
+\title{Are Custom Drivers Needed for vAttention?}
 
 \author{\IEEEauthorblockN{Project Team}
-\IEEEauthorblockA{University Course Project}}
+\IEEEauthorblockA{CDA 5106 Course Project}}
 
 \begin{document}
 \maketitle
@@ -184,6 +189,12 @@ T=\left\lfloor\frac{P}{S_{\text{page-token}}}\right\rfloor,
 \end{equation}
 where $P=2{,}097{,}152$ bytes is the physical page 
 size and $S_{\text{page-token}}$ is the per-token page-buffer footprint.
+The floor indicates that a 2\,MiB page does not always divide evenly into
+an integer number of token slots, so there can be a small fixed packing
+loss per mapped page. We note that effect but do not model it separately
+in the fragmentation curves, because the runtime quantity studied in this
+project and tied to our research question is tail slack in the final mapped
+page as context grows.
 The terms in $S_{\text{page-token}}$ are not fitted constants. They come
 directly from the trained model configuration and therefore from the model
 architecture itself. In other words, our analytical predictor uses
@@ -232,33 +243,71 @@ The measured tokens per page were:
 \item Mistral-Nemo-12B synthetic MLA: $T=5461$
 \end{itemize}
 
-\begin{figure}[t]
+\begin{figure}[!t]
+\centering
+\begin{subfigure}[t]{\columnwidth}
+\centering
+\includegraphics[width=\columnwidth]{../server_plots/qwen-14b/context_vs_fragmentation.png}
+\caption{Qwen-14B (MHA).}
+\end{subfigure}
+\vspace{2pt}
+\begin{subfigure}[t]{\columnwidth}
+\centering
+\includegraphics[width=\columnwidth]{../server_plots/deepseek-v2-lite/context_vs_fragmentation.png}
+\caption{DeepSeek-V2-Lite (MLA).}
+\end{subfigure}
+\caption{Expected MHA versus MLA contrast in tail-waste fragmentation. DeepSeek-V2-Lite uses a more memory-efficient MLA cache layout than Qwen-14B, but because that efficiency increases tokens per 2\,MiB page, its fragmentation envelope falls more slowly with context length. The result is the expected tradeoff: lower bytes per token, but a farther-right context threshold for making 2\,MiB pages insignificant.}
+\label{fig:qwen-deepseek-fragmentation}
+\end{figure}
+
+\begin{figure}[!t]
 \centering
 \includegraphics[width=\columnwidth]{../server_plots/comparisons/four-models/cache_bytes_vs_context.png}
 \caption{Allocated cache versus context length across the four measured runs. MHA and DeepSeek grow faster in allocated cache than the two Mistral variants, while the synthetic MLA conversion yields the smallest long-context growth among the Mistral pair.}
 \label{fig:cache-growth}
 \end{figure}
 
-Figure~\ref{fig:cache-growth} answers the first part of the architectural comparison. The four-model cache-growth plot shows that the models do not all scale in the same way. In particular, the Mistral variants are more favorable than Qwen-14B and DeepSeek-V2-Lite in allocated cache growth over the ranges we measured. However, that alone is not enough to answer the driver question, because the relevant metric for the driver is \emph{tail waste percentage}, not just total allocated bytes.
+Our first cross-architecture comparison behaved as expected. Figure~\ref{fig:qwen-deepseek-fragmentation} shows that the real MLA model, DeepSeek-V2-Lite, is more memory efficient than the dense MHA baseline, Qwen-14B, yet its larger tokens-per-page value pushes the tail-waste curve to decay more slowly. In other words, MLA can reduce allocated cache growth while simultaneously requiring a longer context to cross the $5\%$ fragmentation threshold. This is exactly the tradeoff predicted by the analytical model.
 
-\begin{figure*}[t]
+The next comparison was less intuitive because MLA is generally intended to reduce KV-cache memory relative to denser layouts such as GQA, so one might expect DeepSeek-V2-Lite to outperform Mistral-Nemo-12B in allocated cache growth. Figure~\ref{fig:cache-growth}, however, shows the opposite trend over our measured range: the two Mistral runs were more favorable than both Qwen-14B and DeepSeek-V2-Lite. This result cautioned us against treating the DeepSeek-versus-Mistral observation as a pure MLA-versus-GQA experiment, because the backbones differ in many other architectural respects.
+
+\begin{figure}[!t]
 \centering
-\begin{subfigure}[t]{0.49\textwidth}
+\begin{subfigure}[t]{\columnwidth}
 \centering
-\includegraphics[width=\textwidth]{../server_plots/mistral-nemo-12b/context_vs_fragmentation.png}
-\caption{Measured Mistral-Nemo-12B GQA fragmentation with a worst-case analytical envelope.}
+\includegraphics[width=\columnwidth]{../server_plots/mistral-nemo-12b/analytical_fragmentation.png}
+\caption{Exact analytical sawtooth for Mistral-Nemo-12B (GQA).}
 \end{subfigure}
-\hfill
-\begin{subfigure}[t]{0.49\textwidth}
+\vspace{2pt}
+\begin{subfigure}[t]{\columnwidth}
 \centering
-\includegraphics[width=\textwidth]{../server_plots/mistral-nemo-12b/analytical_fragmentation.png}
-\caption{Exact analytical sawtooth for the same geometry.}
+\includegraphics[width=\columnwidth]{../server_plots/mistral-nemo-12b-mla/analytical_fragmentation.png}
+\caption{Exact analytical sawtooth for synthetic Mistral-Nemo-12B MLA.}
 \end{subfigure}
-\caption{Side-by-side empirical and analytical views for Mistral-Nemo-12B. The analytical model predicts the measured tail-waste behavior closely, which supports using model parameters to estimate when 2\,MiB pages become acceptable.}
+\caption{Analytical fragmentation predictions for the backbone-matched Mistral runs. The model predicts the full sawtooth structure from architecture and context length alone, and it also makes the GQA-versus-MLA shift in tokens per page visually explicit before looking back at the measured runs.}
 \label{fig:mistral-analytical}
-\end{figure*}
+\end{figure}
 
-Figure~\ref{fig:mistral-analytical} addresses the second research question. The empirical and analytical curves match closely. The exact analytical prediction error was effectively zero for the short Qwen and DeepSeek runs and remained small for the long Mistral runs: the mean absolute error was approximately $0.06$ percentage points for Mistral GQA and $0.12$ percentage points for synthetic Mistral MLA. That is sufficiently accurate for deployment-oriented decision support.
+\begin{figure}[!t]
+\centering
+\begin{subfigure}[t]{\columnwidth}
+\centering
+\includegraphics[width=\columnwidth]{../server_plots/mistral-nemo-12b/context_vs_fragmentation.png}
+\caption{Mistral-Nemo-12B (GQA).}
+\end{subfigure}
+\vspace{2pt}
+\begin{subfigure}[t]{\columnwidth}
+\centering
+\includegraphics[width=\columnwidth]{../server_plots/mistral-nemo-12b-mla/context_vs_fragmentation.png}
+\caption{Synthetic Mistral-Nemo-12B MLA.}
+\end{subfigure}
+\caption{Backbone-matched GQA versus MLA comparison on Mistral-Nemo-12B. Once the backbone is held fixed, the expected tradeoff reappears clearly: the synthetic MLA variant uses less cache overall, but its larger tokens-per-page value shifts the fragmentation curve farther right than the GQA baseline.}
+\label{fig:mistral-gqa-vs-mla}
+\end{figure}
+
+The synthetic Mistral MLA path resolved the ambiguity from the DeepSeek-versus-Mistral comparison. Figure~\ref{fig:mistral-gqa-vs-mla} provides the apples-to-apples experiment we actually wanted: GQA and MLA on the same backbone. In that controlled setting, MLA again reduces allocated bytes while delaying the point at which 2\,MiB tail waste becomes negligible. This is the clearest evidence that the relevant fragmentation behavior is governed by tokens per page rather than by the MLA label.
+
+Figure~\ref{fig:mistral-analytical} addresses the second research question from the analytical side: using only model geometry, it predicts the full sawtooth structure for both Mistral configurations and makes clear why MLA shifts the curve farther right. Figure~\ref{fig:mistral-gqa-vs-mla} then shows that the measured runs follow the same story in practice. Quantitatively, the exact analytical prediction error was effectively zero for the short Qwen and DeepSeek runs and remained small for the long Mistral runs: the mean absolute error was approximately $0.06$ percentage points for Mistral GQA and $0.12$ percentage points for synthetic Mistral MLA. That is sufficiently accurate for deployment-oriented decision support.
 
 Using the worst-case threshold $C_{5\%}=19T$, we obtain the following breakpoints:
 \begin{center}
@@ -274,12 +323,20 @@ Mistral synthetic MLA & 5461 & 103{,}759 \\
 \end{tabular}
 \end{center}
 
-These thresholds explain the paper's central conclusion. If a provider offers a very long maximum context, then even 2\,MiB pages may eventually become acceptable. For example, DeepSeek-V2-Lite advertises a much larger model context than the 32\,k cap used in our measured server run, and its analytical threshold occurs around 34.6\,k tokens. In that regime, 2\,MiB tail waste can plausibly become insignificant. But the opposite trend also appears: as attention becomes more memory efficient, each 2\,MiB page holds more tokens, and the $5\%$ threshold shifts farther right. The synthetic Mistral MLA experiment makes this especially clear. Although MLA reduces total memory footprint, it pushes the worst-case insignificance threshold to roughly 103.8\,k tokens, very close to the end of the long-context range we were able to reach experimentally.
+These thresholds explain the paper's central conclusion. If a provider offers a very long maximum context, then even 2\,MiB pages may eventually become acceptable. For example, DeepSeek-V2-Lite advertises a much larger model context than the 32\,k cap used in our measured server run, and its analytical threshold occurs around 34.6\,k tokens. In that regime, 2\,MiB tail waste can plausibly become insignificant. But the controlled Mistral experiment shows the opposite pressure just as clearly: as attention becomes more memory efficient, each 2\,MiB page holds more tokens, and the $5\%$ threshold shifts farther right. The synthetic Mistral MLA run makes this especially clear. Although MLA reduces total memory footprint, it pushes the worst-case insignificance threshold to roughly 103.8\,k tokens, very close to the end of the long-context range we were able to reach experimentally.
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=\columnwidth]{../server_plots/deepseek-v2-lite/deepseek-v2-lite-analytical-120k.png}
+\caption{Analytical DeepSeek-V2-Lite fragmentation extended to 120\,k tokens. Because the validated model gives $T=1820$ and $C_{5\%}=19T=34{,}580$, the predicted curve falls below the $5\%$ insignificance threshold shortly after 40\,k tokens, supporting the conclusion that sufficiently long contexts can make 2\,MiB tail waste effectively negligible for this model family.}
+\label{fig:deepseek-120k-analytical}
+\end{figure}
 
 Therefore the answer to the primary research question is \emph{it depends}. A user can sometimes get away with the stock 2\,MiB granularity, but the decision depends on architecture and target context range. The best-case scenario for memory efficiency is still the combination of a small page size and an efficient attention layout. Efficient attention does not remove the value of smaller pages; in some cases it increases that value by delaying the point at which tail waste becomes negligible.
 
+\FloatBarrier
 \section{Conclusion}
-This project set out to determine whether the vAttention custom small-page driver is still necessary at long context lengths. Our experimental answer is conditional rather than absolute. For some models, such as DeepSeek-V2-Lite, long contexts can make 2\,MiB tail waste effectively insignificant. For others, especially when memory-efficient attention increases the number of tokens packed into each page, significant waste can persist deep into the usable context range. The controlled Mistral GQA versus synthetic Mistral MLA comparison demonstrates this complication clearly.
+This project set out to determine whether the vAttention custom small-page driver is still necessary at long context lengths. Our answer is conditional rather than absolute. For some models, such as DeepSeek-V2-Lite, our validated analytical model shows that sufficiently long contexts can make 2\,MiB tail waste effectively insignificant. For others, especially when memory-efficient attention increases the number of tokens packed into each page, significant waste can persist deep into the usable context range. The controlled Mistral GQA versus synthetic Mistral MLA comparison demonstrates this complication clearly.
 
 The more useful outcome of the project is not a one-size-fits-all rule, but a predictive method. We showed that tail waste can be predicted from model parameters and context length with high accuracy. That lets users estimate average or worst-case fragmentation over their intended operating range and decide whether the operational overhead of installing custom open-source NVIDIA drivers is justified for their workload.
 

@@ -2,21 +2,27 @@
 \@writefile{toc}{\contentsline {section}{\numberline {I}Introduction and Background}{1}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {II}Design and Implementation}{1}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-A}}Measurement pipeline}{1}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-B}}MLA support and synthetic Mistral MLA}{2}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-C}}Analytical tail-waste model}{2}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-B}}MLA support and synthetic Mistral MLA}{1}{}\protected@file@percent }
 \@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Tail waste under paged KV allocation. A request with context length $C$ maps $B(C)=\lceil C/T\rceil $ pages, each holding $T$ tokens, so the unused capacity in the final mapped page is $B(C)T-C$.}}{2}{}\protected@file@percent }
 \providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
 \newlabel{fig:fragmentation-intuition}{{1}{2}{}{figure.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-C}}Analytical tail-waste model}{2}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {III}Evaluation and Results}{2}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Expected MHA versus MLA contrast in tail-waste fragmentation. DeepSeek-V2-Lite uses a more memory-efficient MLA cache layout than Qwen-14B, but because that efficiency increases tokens per 2\,MiB page, its fragmentation envelope falls more slowly with context length. The result is the expected tradeoff: lower bytes per token, but a farther-right context threshold for making 2\,MiB pages insignificant.}}{3}{}\protected@file@percent }
+\newlabel{fig:qwen-deepseek-fragmentation}{{2}{3}{}{figure.2}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Allocated cache versus context length across the four measured runs. MHA and DeepSeek grow faster in allocated cache than the two Mistral variants, while the synthetic MLA conversion yields the smallest long-context growth among the Mistral pair.}}{3}{}\protected@file@percent }
+\newlabel{fig:cache-growth}{{3}{3}{}{figure.3}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Analytical fragmentation predictions for the backbone-matched Mistral runs. The model predicts the full sawtooth structure from architecture and context length alone, and it also makes the GQA-versus-MLA shift in tokens per page visually explicit before looking back at the measured runs.}}{4}{}\protected@file@percent }
+\newlabel{fig:mistral-analytical}{{4}{4}{}{figure.4}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Backbone-matched GQA versus MLA comparison on Mistral-Nemo-12B. Once the backbone is held fixed, the expected tradeoff reappears clearly: the synthetic MLA variant uses less cache overall, but its larger tokens-per-page value shifts the fragmentation curve farther right than the GQA baseline.}}{4}{}\protected@file@percent }
+\newlabel{fig:mistral-gqa-vs-mla}{{5}{4}{}{figure.5}{}}
 \bibcite{vattentionrepo}{1}
 \bibcite{pagedattention}{2}
 \bibcite{deepseekv2}{3}
 \bibcite{mistralnemo}{4}
 \bibcite{qwen}{5}
-\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Allocated cache versus context length across the four measured runs. MHA and DeepSeek grow faster in allocated cache than the two Mistral variants, while the synthetic MLA conversion yields the smallest long-context growth among the Mistral pair.}}{3}{}\protected@file@percent }
-\newlabel{fig:cache-growth}{{2}{3}{}{figure.2}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {IV}Conclusion}{3}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{References}{3}{}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Side-by-side empirical and analytical views for Mistral-Nemo-12B. The analytical model predicts the measured tail-waste behavior closely, which supports using model parameters to estimate when 2\,MiB pages become acceptable.}}{4}{}\protected@file@percent }
-\newlabel{fig:mistral-analytical}{{3}{4}{}{figure.3}{}}
-\gdef \@abspage@last{4}
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Analytical DeepSeek-V2-Lite fragmentation extended to 120\,k tokens. Because the validated model gives $T=1820$ and $C_{5\%}=19T=34{,}580$, the predicted curve falls below the $5\%$ insignificance threshold shortly after 40\,k tokens, supporting the conclusion that sufficiently long contexts can make 2\,MiB tail waste effectively negligible for this model family.}}{5}{}\protected@file@percent }
+\newlabel{fig:deepseek-120k-analytical}{{6}{5}{}{figure.6}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {IV}Conclusion}{5}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{References}{5}{}\protected@file@percent }
+\gdef \@abspage@last{5}
