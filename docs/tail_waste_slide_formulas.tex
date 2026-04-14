@@ -1,0 +1,80 @@
+\documentclass[12pt]{article}
+\usepackage[margin=0.7in]{geometry}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{lmodern}
+\usepackage[T1]{fontenc}
+\usepackage{microtype}
+\pagestyle{empty}
+
+\begin{document}
+
+\begin{center}
+{\LARGE Tail-Waste Expressions}
+\end{center}
+
+\vspace{0.5em}
+
+\begin{align*}
+F_{\text{exact}}(C)
+&=
+100 \cdot
+\frac{\left\lceil \frac{C}{T} \right\rceil T - C}
+{\left\lceil \frac{C}{T} \right\rceil T}
+\\[1.0em]
+F_{\text{worst}}(C)
+&\approx
+100 \cdot \frac{T}{C + T}
+\end{align*}
+
+\vspace{0.8em}
+
+\noindent\textbf{Variable meanings}
+\begin{itemize}
+    \item $C$: context length in tokens for the request.
+    \item $T$: number of cached tokens that fit in one physical page.
+    \item $\left\lceil \frac{C}{T} \right\rceil$: number of pages mapped for context length $C$.
+    \item $\left\lceil \frac{C}{T} \right\rceil T$: number of tokens that could be held by all mapped blocks
+    \item $\left\lceil \frac{C}{T} \right\rceil T - C$: unused token capacity in the final mapped page, i.e., tail waste.
+    \item $F_{\text{exact}}(C)$: exact tail-waste percentage at context length $C$.
+    \item $F_{\text{worst}}(C)$: smooth worst-case upper envelope of the fragmentation peaks.
+\end{itemize}
+
+\newpage
+
+\begin{center}
+{\LARGE Tokens Per Page by Architecture}
+\end{center}
+
+\vspace{0.5em}
+
+\begin{align*}
+T_{\text{dense}}
+&=
+\left\lfloor
+\frac{P}{H_{\text{kv,loc}} D b}
+\right\rfloor
+\\[1.2em]
+T_{\text{MLA}}
+&=
+\left\lfloor
+\frac{P}{(r_{\text{kv}} + d_{\text{rope}}) b}
+\right\rfloor
+\end{align*}
+
+\vspace{0.8em}
+
+\noindent\textbf{Sources of the terms}
+\begin{itemize}
+    \item $P$: physical page size in bytes. In our experiments, this is fixed at 2 MB.
+    \item $H_{\text{kv,loc}}$: local KV-head count on one tensor-parallel worker, taken from the model architecture and parallel configuration.
+    \item $D$: per-head hidden dimension, taken from the trained model configuration.
+    \item $b$: bytes per stored cache element, determined by the KV cache datatype such as FP16 or BF16.
+    \item $r_{\text{kv}}$: KV latent rank used by MLA, taken from the MLA model configuration.
+    \item $d_{\text{rope}}$: dimensionality of the RoPE-retained key component in MLA, also taken from the MLA model configuration.
+    \item $\lfloor \cdot \rfloor$: indicates that only a whole number of token slots can fit in one page.
+    \item $T_{\text{dense}}$: dense-layout tokens per page for MHA or GQA.
+    \item $T_{\text{MLA}}$: MLA-layout tokens per page.
+\end{itemize}
+
+\end{document}
