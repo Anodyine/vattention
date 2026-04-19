@@ -10,9 +10,11 @@ SWEEP_PYTHON="${REPO_ROOT}/.venv-frag-sweep/bin/python"
 PLOT_PYTHON="${REPO_ROOT}/.venv-londy/bin/python"
 SWEEP_SCRIPT="${REPO_ROOT}/scripts/fragmentation_context_sweep.py"
 PLOT_SCRIPT="${REPO_ROOT}/scripts/plotting/plot_context_vs_fragmentation.py"
+ANALYTICAL_PLOT_SCRIPT="${REPO_ROOT}/scripts/plotting/plot_analytical_fragmentation.py"
 
 MODEL_KEY=""
 CONTEXT_LENGTHS=""
+INTER_REQUEST_DELAY_SECONDS=""
 PORT=8000
 WAIT_TIMEOUT=180
 SHUTDOWN_TIMEOUT=60
@@ -26,6 +28,10 @@ while [[ $# -gt 0 ]]; do
             ;;
         --context-lengths)
             CONTEXT_LENGTHS="$2"
+            shift 2
+            ;;
+        --inter-request-delay-seconds)
+            INTER_REQUEST_DELAY_SECONDS="$2"
             shift 2
             ;;
         --port)
@@ -52,7 +58,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 if [[ -z "${MODEL_KEY}" ]]; then
-    printf 'Usage: %s --model-key {qwen-14b|mistral-nemo-12b|mistral-nemo-12b-mla|llama-3-8b|deepseek-v2-lite} [--context-lengths CSV] [--port N]\n' "$0" >&2
+    printf 'Usage: %s --model-key {qwen-14b|mistral-nemo-12b|mistral-nemo-12b-mla|llama-3-8b|deepseek-v2-lite} [--context-lengths CSV] [--inter-request-delay-seconds S] [--port N]\n' "$0" >&2
     exit 1
 fi
 
@@ -93,7 +99,7 @@ case "${MODEL_KEY}" in
         ;;
 esac
 
-for required in "${SWEEP_PYTHON}" "${PLOT_PYTHON}" "${SWEEP_SCRIPT}" "${PLOT_SCRIPT}" "${WRAPPER}"; do
+for required in "${SWEEP_PYTHON}" "${PLOT_PYTHON}" "${SWEEP_SCRIPT}" "${PLOT_SCRIPT}" "${ANALYTICAL_PLOT_SCRIPT}" "${WRAPPER}"; do
     if [[ ! -x "${required}" && ! -f "${required}" ]]; then
         printf 'Missing required path: %s\n' "${required}" >&2
         exit 1
@@ -106,6 +112,8 @@ SERVER_PLOTS_DIR="${REPO_ROOT}/server_plots/${MODEL_SLUG}"
 SERVER_LOG="${SERVER_PLOTS_DIR}/server.log"
 PLOT_PATH="${SERVER_PLOTS_DIR}/context_vs_fragmentation.png"
 SUMMARY_PATH="${SERVER_PLOTS_DIR}/context_vs_fragmentation_summary.csv"
+ANALYTICAL_PLOT_PATH="${SERVER_PLOTS_DIR}/analytical_fragmentation.png"
+ANALYTICAL_SUMMARY_PATH="${SERVER_PLOTS_DIR}/analytical_fragmentation_summary.csv"
 METRICS_PATH="${SERVER_OUTPUT_HOST}/sequence_metrics.csv"
 BENCHMARK_CONFIG_PATH="${SERVER_OUTPUT_HOST}/benchmark_config.yml"
 export MPLCONFIGDIR=/tmp/mplconfig
@@ -134,7 +142,9 @@ cleanup() {
 trap cleanup EXIT
 
 printf 'Starting %s server...\n' "${MODEL_NAME}"
-"${WRAPPER}" --port "${PORT}" >"${SERVER_LOG}" 2>&1 &
+"${WRAPPER}" \
+    --replica_scheduler_max_batch_size 1 \
+    --port "${PORT}" >"${SERVER_LOG}" 2>&1 &
 server_pid=$!
 
 printf 'Waiting for server readiness on port %s...\n' "${PORT}"
@@ -162,6 +172,9 @@ printf 'Running fragmentation sweep for %s...\n' "${MODEL_NAME}"
 sweep_cmd=("${SWEEP_PYTHON}" "${SWEEP_SCRIPT}" --model "${MODEL_NAME}" --fail-fast)
 if [[ -n "${CONTEXT_LENGTHS}" ]]; then
     sweep_cmd+=(--context-lengths "${CONTEXT_LENGTHS}")
+fi
+if [[ -n "${INTER_REQUEST_DELAY_SECONDS}" ]]; then
+    sweep_cmd+=(--inter-request-delay-seconds "${INTER_REQUEST_DELAY_SECONDS}")
 fi
 "${sweep_cmd[@]}"
 
@@ -218,9 +231,20 @@ printf 'Plotting results...\n'
     --title "${PLOT_TITLE}" \
     --bins 16
 
+printf 'Plotting analytical companion figure...\n'
+"${PLOT_PYTHON}" "${ANALYTICAL_PLOT_SCRIPT}" \
+    --run-dir "${SERVER_OUTPUT_HOST}" \
+    --server-log "${SERVER_LOG}" \
+    --out-plot "${ANALYTICAL_PLOT_PATH}" \
+    --out-summary "${ANALYTICAL_SUMMARY_PATH}" \
+    --title "${MODEL_NAME} Analytical Fragmentation" \
+    --include-worst-case
+
 printf '\nPipeline complete.\n'
 printf 'Benchmark config: %s\n' "${BENCHMARK_CONFIG_PATH}"
 printf 'Metrics: %s\n' "${METRICS_PATH}"
 printf 'Plot: %s\n' "${PLOT_PATH}"
 printf 'Summary: %s\n' "${SUMMARY_PATH}"
+printf 'Analytical plot: %s\n' "${ANALYTICAL_PLOT_PATH}"
+printf 'Analytical summary: %s\n' "${ANALYTICAL_SUMMARY_PATH}"
 printf 'Server log: %s\n' "${SERVER_LOG}"

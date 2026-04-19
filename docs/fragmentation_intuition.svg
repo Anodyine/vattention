@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="300" viewBox="0 0 980 300">
+  <defs>
+    <style>
+      .title { font: 700 22px sans-serif; fill: #111; }
+      .label { font: 16px sans-serif; fill: #222; }
+      .small { font: 14px sans-serif; fill: #333; }
+      .formula { font: italic 18px serif; fill: #111; }
+      .used { fill: #4f8ef7; stroke: #2d5fb3; stroke-width: 2; }
+      .waste { fill: #f5c2c7; stroke: #b65362; stroke-width: 2; }
+      .page { fill: none; stroke: #666; stroke-width: 2; }
+      .brace { fill: none; stroke: #333; stroke-width: 2; }
+      .arrow { stroke: #333; stroke-width: 2; fill: none; marker-end: url(#arrowhead); }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0,0 10,4 0,8" fill="#333"/>
+    </marker>
+  </defs>
+
+  <text x="30" y="35" class="title">Tail waste comes directly from mapped virtual-memory capacity</text>
+
+  <text x="30" y="72" class="label">Example: each page holds T tokens, the request needs C tokens, and the allocator maps B(C) = ceil(C/T) pages.</text>
+
+  <!-- page 1 -->
+  <rect x="80" y="120" width="180" height="70" class="used"/>
+  <rect x="80" y="120" width="180" height="70" class="page"/>
+  <text x="146" y="160" class="label">Page 1</text>
+
+  <!-- page 2 -->
+  <rect x="280" y="120" width="180" height="70" class="used"/>
+  <rect x="280" y="120" width="180" height="70" class="page"/>
+  <text x="346" y="160" class="label">Page 2</text>
+
+  <!-- tail page -->
+  <rect x="480" y="120" width="90" height="70" class="used"/>
+  <rect x="570" y="120" width="90" height="70" class="waste"/>
+  <rect x="480" y="120" width="180" height="70" class="page"/>
+  <text x="528" y="160" class="label">Page B(C)</text>
+
+  <!-- page capacity labels -->
+  <path d="M80 205 C80 220,260 220,260 205" class="brace"/>
+  <text x="145" y="242" class="small">T tokens of capacity</text>
+
+  <path d="M480 205 C480 220,660 220,660 205" class="brace"/>
+  <text x="536" y="242" class="small">T tokens of capacity</text>
+
+  <!-- used capacity arrow -->
+  <path d="M85 105 L566 105" class="arrow"/>
+  <text x="235" y="95" class="label">Used tokens = C</text>
+
+  <!-- mapped capacity arrow -->
+  <path d="M80 265 L660 265" class="arrow"/>
+  <text x="248" y="286" class="label">Mapped capacity = B(C)T</text>
+
+  <!-- waste annotation -->
+  <path d="M615 95 L615 115" class="arrow"/>
+  <text x="690" y="132" class="label">Tail waste</text>
+  <text x="690" y="157" class="small">unused tokens in the last mapped page</text>
+  <text x="690" y="184" class="small">= B(C)T - C</text>
+
+  <!-- formula block -->
+  <text x="690" y="238" class="formula">Fragmentation(C)</text>
+  <text x="690" y="264" class="formula">= (mapped capacity - used tokens) / mapped capacity</text>
+  <text x="690" y="290" class="formula">= (B(C)T - C) / B(C)T</text>
+</svg>

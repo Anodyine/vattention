@@ -1,0 +1,179 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{booktabs}
+\usepackage{hyperref}
+
+\title{Analytical Fragmentation Predictions for vAttention Cache Layouts}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{Goal}
+
+This note records the analytical fragmentation formulas that match the metric plotted in our empirical figures.
+The important distinction is that the runtime fragmentation percentage is a \emph{tail-slack percentage in token capacity}, not the older proposal's fixed-byte-waste ratio.
+
+\section{Runtime Fragmentation Metric}
+
+Let
+\begin{itemize}
+    \item $C$ be the current context length in tokens,
+    \item $T$ be the allocator's number of cached tokens per physical page,
+    \item $B(C) = \lceil C/T \rceil$ be the number of mapped blocks needed for that context.
+\end{itemize}
+
+Then the exact fragmentation percentage used by the runtime is
+\begin{equation}
+F_{\text{exact}}(C)
+= 100 \cdot \frac{B(C)T - C}{B(C)T}
+= 100 \cdot \frac{\lceil C/T \rceil T - C}{\lceil C/T \rceil T}.
+\end{equation}
+
+This produces the sawtooth pattern observed in the empirical plots.
+
+\section{Worst-Case Tail-Waste Envelope}
+
+For a smooth upper envelope, consider the point immediately after a new page has been allocated.
+At the beginning of each tooth, one page has just been added and is almost entirely empty.
+This gives the smooth worst-case envelope
+\begin{equation}
+F_{\text{worst}}(C)
+\approx 100 \cdot \frac{T}{C + T}.
+\end{equation}
+
+This is the dotted curve we overlay on the empirical graphs.
+Its purpose is not to reproduce every point inside the tooth, but to predict the vertical scale of the fragmentation peaks.
+
+\section{Average Tail-Waste Approximation}
+
+If we assume that the final mapped page is half full on average, then the average smooth approximation is
+\begin{equation}
+F_{\text{avg}}(C)
+\approx 100 \cdot \frac{T/2}{C + T/2}.
+\end{equation}
+
+This is closer in spirit to the original proposal, but it does not emphasize the peak heights as clearly as the worst-case envelope.
+
+\section{Architecture-Dependent Tokens Per Page}
+
+The architecture-specific part of the prediction is the number of cached tokens per page:
+\begin{equation}
+T = \left\lfloor \frac{P}{S_{\text{page-token}}} \right\rfloor,
+\end{equation}
+where $P$ is the physical page size in bytes and $S_{\text{page-token}}$ is the per-token page-buffer footprint used by the runtime.
+
+\subsection{Dense KV Layouts: MHA, GQA, and MQA}
+
+For dense KV cache layouts, the runtime stores one key slice and one value slice per layer, but the page-buffer token size is computed per layer per side:
+\begin{equation}
+S_{\text{page-token}}^{\text{dense}}
+= H_{\text{kv,loc}} \cdot D \cdot b,
+\end{equation}
+where
+\begin{itemize}
+    \item $H_{\text{kv,loc}}$ is the number of local KV heads on one tensor-parallel worker,
+    \item $D$ is the head dimension,
+    \item $b$ is the number of bytes per element.
+\end{itemize}
+
+Therefore
+\begin{equation}
+T_{\text{dense}}
+= \left\lfloor \frac{P}{H_{\text{kv,loc}} D b} \right\rfloor.
+\end{equation}
+
+This gives
+\begin{equation}
+F_{\text{worst}}^{\text{dense}}(C)
+\approx
+100 \cdot
+\frac{
+\left\lfloor \frac{P}{H_{\text{kv,loc}} D b} \right\rfloor
+}{
+C +
+\left\lfloor \frac{P}{H_{\text{kv,loc}} D b} \right\rfloor
+}.
+\end{equation}
+
+\paragraph{MHA.}
+For MHA, all attention heads are KV heads, so $H_{\text{kv,loc}} = H_{\text{loc}}$.
+The proposal was directionally correct that MHA uses the full head count, but the plotted fragmentation percentage is controlled by $T_{\text{dense}}$, not by the total cache bytes per token across all layers.
+
+\paragraph{GQA.}
+For GQA, $H_{\text{kv,loc}}$ is smaller than in MHA, which increases $T$ and lowers the fragmentation envelope.
+
+\subsection{MLA Layouts}
+
+For MLA, the runtime stores the latent KV state and the RoPE key component.
+The per-token page-buffer footprint is
+\begin{equation}
+S_{\text{page-token}}^{\text{MLA}}
+= (r_{\text{kv}} + d_{\text{rope}}) \cdot b,
+\end{equation}
+where
+\begin{itemize}
+    \item $r_{\text{kv}}$ is the KV latent rank,
+    \item $d_{\text{rope}}$ is the RoPE key dimension.
+\end{itemize}
+
+Therefore
+\begin{equation}
+T_{\text{MLA}}
+= \left\lfloor \frac{P}{(r_{\text{kv}} + d_{\text{rope}}) b} \right\rfloor,
+\end{equation}
+and
+\begin{equation}
+F_{\text{worst}}^{\text{MLA}}(C)
+\approx
+100 \cdot
+\frac{
+\left\lfloor \frac{P}{(r_{\text{kv}} + d_{\text{rope}}) b} \right\rfloor
+}{
+C +
+\left\lfloor \frac{P}{(r_{\text{kv}} + d_{\text{rope}}) b} \right\rfloor
+}.
+\end{equation}
+
+\section{Concrete Predictions for Current Runs}
+
+All current runs use $P = 2{,}097{,}152$ bytes (2 MiB pages).
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}llll@{}}
+\toprule
+Run & Architecture & $T$ & Worst-case envelope \\ \midrule
+Qwen-14B & MHA / dense KV & $819$ &
+$F_{\text{worst}}(C) \approx 100 \cdot \frac{819}{C + 819}$ \\[4pt]
+Mistral-Nemo-12B & GQA / dense KV & $4096$ &
+$F_{\text{worst}}(C) \approx 100 \cdot \frac{4096}{C + 4096}$ \\[4pt]
+DeepSeek-V2-Lite & MLA & $1820$ &
+$F_{\text{worst}}(C) \approx 100 \cdot \frac{1820}{C + 1820}$ \\[4pt]
+Mistral-Nemo-12B (Synthetic MLA) & MLA & $5461$ &
+$F_{\text{worst}}(C) \approx 100 \cdot \frac{5461}{C + 5461}$ \\ \bottomrule
+\end{tabular}
+\caption{Worst-case fragmentation envelopes for the current experimental runs.}
+\end{table}
+
+\section{Relation to the Original Proposal}
+
+The original proposal modeled a fixed average byte waste that scales with the number of fragmentation points.
+That model is still useful for reasoning about aggregate wasted bytes.
+However, the plotted metric in the current experiments is different:
+\begin{itemize}
+    \item it is measured as tail slack in mapped token capacity,
+    \item it depends directly on $T$, the tokens per page,
+    \item and it naturally produces a sawtooth curve rather than a single smooth amortization curve.
+\end{itemize}
+
+For the current figures, the right analytical objects are therefore:
+\begin{itemize}
+    \item the exact sawtooth law $F_{\text{exact}}(C)$, and
+    \item the worst-case smooth envelope $F_{\text{worst}}(C)$.
+\end{itemize}
+
+\end{document}

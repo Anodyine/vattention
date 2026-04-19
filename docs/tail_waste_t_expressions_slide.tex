@@ -1,0 +1,54 @@
+\documentclass[12pt]{article}
+\usepackage[margin=0.7in]{geometry}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{lmodern}
+\usepackage[T1]{fontenc}
+\usepackage{microtype}
+\pagestyle{empty}
+
+\begin{document}
+
+\begin{center}
+{\LARGE Tokens Per Page Expressions}
+\end{center}
+
+\vspace{0em}
+
+\begin{align*}
+T_{\text{dense}}
+&=
+\left\lfloor
+\frac{P}{H_{\text{kv,loc}} D b}
+\right\rfloor
+\\[1.2em]
+T_{\text{MLA}}
+&=
+\left\lfloor
+\frac{P}{(r_{\text{kv}} + d_{\text{rope}}) b}
+\right\rfloor
+\end{align*}
+
+\vspace{0.8em}
+
+\noindent\textbf{Where the terms come from}
+\begin{itemize}
+    \item $P$: physical page size chosen by the runtime. In our experiments, this is fixed at 2 MB.
+    \item $H_{\text{kv,loc}}$: local KV-head count, determined by the model architecture and tensor-parallel setup.
+    \item $D$: head dimension from the trained model configuration.
+    \item $b$: bytes per stored KV-cache element, determined by the cache datatype such as FP16 or BF16.
+    \item $r_{\text{kv}}$: MLA KV latent rank from the model configuration.
+    \item $d_{\text{rope}}$: MLA RoPE-retained key dimension from the model configuration.
+\end{itemize}
+
+\vspace{0.5em}
+
+\noindent\textbf{Main point}
+
+\noindent
+The dense and MLA expressions are different, but every term comes from
+the model configuration or fixed runtime settings. That is why we can
+predict tail waste during inference directly from context length and
+known model parameters.
+
+\end{document}
