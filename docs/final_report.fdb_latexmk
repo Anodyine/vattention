@@ -1,10 +1,10 @@
 # Fdb version 4
-["xdvipdfmx"] 1776626636.22577 "final_report.xdv" "final_report.pdf" "final_report" 1776626638.39516 0
-  "final_report.xdv" 1776626636.17358 190940 47c0a9eefb1575ad2b5c19532e5f011f "xelatex"
+["xdvipdfmx"] 1776626778.16927 "final_report.xdv" "final_report.pdf" "final_report" 1776626780.54136 0
+  "final_report.xdv" 1776626778.11921 191260 fd84472a701cad582a107b38a5399667 "xelatex"
   (generated)
   "final_report.pdf"
   (rewritten before read)
-["xelatex"] 1776626635.28838 "/home/anodyine/repos/vattention/docs/final_report.tex" "final_report.xdv" "final_report" 1776626638.39331 0
+["xelatex"] 1776626777.4407 "/home/anodyine/repos/vattention/docs/final_report.tex" "final_report.xdv" "final_report" 1776626780.53978 0
   "../server_plots/comparisons/four-models/cache_bytes_vs_context.png" 1776626263.53691 114156 038b88e2b2face86523fb6192fdcd335 ""
   "../server_plots/deepseek-v2-lite/context_vs_fragmentation.png" 1776626263.54173 141169 a16857806c36889c86edb4fdc573b3b6 ""
   "../server_plots/deepseek-v2-lite/deepseek-v2-lite-analytical-120k.png" 1776626263.54261 113350 27ddc38a54209f12dc48e501c80eb2a8 ""
@@ -13,7 +13,7 @@
   "../server_plots/mistral-nemo-12b/analytical_fragmentation.png" 1776626263.54561 123332 745d05046ac5050a3955e70e56b6639e ""
   "../server_plots/mistral-nemo-12b/context_vs_fragmentation.png" 1776626263.54655 147001 ef880df6978c865fb49ef1d75bce6a87 ""
   "../server_plots/qwen-14b/context_vs_fragmentation.png" 1776626263.55021 139880 c9144975e6c68153a5174bdaaf17a7fb ""
-  "/home/anodyine/repos/vattention/docs/final_report.tex" 1776626633.78347 23095 7a13012c42cd3f46898ca3406b92ff44 ""
+  "/home/anodyine/repos/vattention/docs/final_report.tex" 1776626777.18619 23128 f69fcc9c462c3529902eb3ce04bb67e5 ""
   "/usr/share/texmf-dist/fonts/map/fontname/texfonts.map" 1775415801 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/share/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmex7.tfm" 1775415801 1004 54797486969f23fa377b128694d548df ""
   "/usr/share/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmex9.tfm" 1775415801 996 a18840b13b499c08ac2de96a99eda4bc ""
@@ -112,8 +112,8 @@
   "/usr/share/texmf-dist/tex/latex/xcolor/xcolor.sty" 1775415801 55384 b454dec21c2d9f45ec0b793f0995b992 ""
   "/usr/share/texmf-dist/web2c/texmf.cnf" 1775415801 43569 fd570f2fa160877d211e859f687312ba ""
   "/var/lib/texmf/web2c/xetex/xelatex.fmt" 1775513330 4836373 6524256fb9818bf026f4ae8eb203d642 ""
-  "final_report.aux" 1776626636.17258 3972 55bda3f34246d9a85a97cc54f1ac7ad1 "xelatex"
-  "final_report.tex" 1776626633.78347 23095 7a13012c42cd3f46898ca3406b92ff44 ""
+  "final_report.aux" 1776626778.11879 3972 55bda3f34246d9a85a97cc54f1ac7ad1 "xelatex"
+  "final_report.tex" 1776626777.18619 23128 f69fcc9c462c3529902eb3ce04bb67e5 ""
   (generated)
   "final_report.aux"
   "final_report.log"
