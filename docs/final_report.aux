@@ -12,18 +12,18 @@
 \newlabel{fig:qwen-deepseek-fragmentation}{{2}{3}{}{figure.2}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Allocated cache versus context length across the four measured runs. MHA and DeepSeek grow faster in allocated cache than the two Mistral variants, while the synthetic MLA conversion yields the smallest long-context growth among the Mistral pair.}}{3}{}\protected@file@percent }
 \newlabel{fig:cache-growth}{{3}{3}{}{figure.3}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Analytical fragmentation predictions for the backbone-matched Mistral runs. The model predicts the full sawtooth structure from architecture and context length alone, and it also makes the GQA-versus-MLA shift in tokens per page visually explicit before looking back at the measured runs.}}{3}{}\protected@file@percent }
-\newlabel{fig:mistral-analytical}{{4}{3}{}{figure.4}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Analytical fragmentation predictions for the backbone-matched Mistral runs. The model predicts the full sawtooth structure from architecture and context length alone, and it also makes the GQA-versus-MLA shift in tokens per page visually explicit before looking back at the measured runs.}}{4}{}\protected@file@percent }
+\newlabel{fig:mistral-analytical}{{4}{4}{}{figure.4}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Backbone-matched GQA versus MLA comparison on Mistral-Nemo-12B. Once the backbone is held fixed, the expected tradeoff reappears clearly: the synthetic MLA variant uses less cache overall, but its larger tokens-per-page value shifts the fragmentation curve farther right than the GQA baseline.}}{4}{}\protected@file@percent }
 \newlabel{fig:mistral-gqa-vs-mla}{{5}{4}{}{figure.5}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Analytical DeepSeek-V2-Lite fragmentation extended to 120\,k tokens. Because the validated model gives $T=1820$ and $C_{5\%}=19T=34{,}580$, the predicted curve falls below the $5\%$ insignificance threshold shortly after 40\,k tokens, supporting the conclusion that sufficiently long contexts can make 2\,MB tail waste effectively negligible for this model family.}}{4}{}\protected@file@percent }
-\newlabel{fig:deepseek-120k-analytical}{{6}{4}{}{figure.6}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {IV}Conclusion}{4}{}\protected@file@percent }
 \bibcite{vattentionrepo}{1}
 \bibcite{pagedattention}{2}
 \bibcite{deepseekv2}{3}
 \bibcite{mistralnemo}{4}
 \bibcite{qwen}{5}
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Analytical DeepSeek-V2-Lite fragmentation extended to 120\,k tokens. Because the validated model gives $T=1820$ and $C_{5\%}=19T=34{,}580$, the predicted curve falls below the $5\%$ insignificance threshold shortly after 40\,k tokens, supporting the conclusion that sufficiently long contexts can make 2\,MB tail waste effectively negligible for this model family.}}{5}{}\protected@file@percent }
+\newlabel{fig:deepseek-120k-analytical}{{6}{5}{}{figure.6}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {IV}Conclusion}{5}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{Appendix}{5}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{References}{5}{}\protected@file@percent }
 \gdef \@abspage@last{5}
