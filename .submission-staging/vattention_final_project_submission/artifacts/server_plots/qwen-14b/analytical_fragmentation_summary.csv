@@ -1,0 +1,2 @@
+architecture,page_size_bytes,dtype_bytes,page_buffer_token_bytes,tokens_per_page,max_context,num_layers,num_kv_heads_local,head_size,kv_lora_rank,qk_rope_head_dim,tokens_per_page_formula,exact_fragmentation_formula,source
+dense_kv,2097152,2,2560,819,8192,40,10,128,,,"T = floor(P / (H_kv,loc * D * b))",F_exact(C) = 100 * (ceil(C / T) * T - C) / (ceil(C / T) * T),run:/home/anodyine/repos/vattention/server-output/qwen-14b (saved hf_config/cache_layout)

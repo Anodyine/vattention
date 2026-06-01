@@ -1,0 +1,820 @@
++ docker exec -i vattn-anodyine bash -lc $'\nset -euo pipefail\noutput_dir="$1"\nmkdir -p "$output_dir"\ncd /workspace/sarathi-lean\nshift\nexec python -m sarathi.entrypoints.openai_server.api_server --output_dir "$output_dir" "$@"\n' bash /workspace/server-output/mistral-nemo-12b --model_name mistralai/Mistral-Nemo-Base-2407 --model_tensor_parallel_degree 4 --model_attention_backend fa_vattn --model_load_format auto --model_max_model_len 131072 --gpu_memory_utilization 0.85 --host 0.0.0.0 --port 8000 --port 8000
+/workspace/sarathi-lean/sarathi/entrypoints/openai_server/api_server.py:45: DeprecationWarning: 
+        on_event is deprecated, use lifespan event handlers instead.
+
+        Read more about it in the
+        [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+        
+  @app.on_event("shutdown")
+INFO 04-06 17:23:57 config.py:41] Starting benchmark with config: Namespace(host='0.0.0.0', port=8000, seed=42, log_level='info', output_dir='/workspace/server-output/mistral-nemo-12b', write_json_trace=True, write_chrome_trace=True, write_metrics=True, enable_profiling=False, gpu_memory_utilization=0.85, time_limit=10281800, replica_resource_mapping='', cluster_num_replicas=1, model_name='mistralai/Mistral-Nemo-Base-2407', model_tensor_parallel_degree=4, model_pipeline_parallel_degree=1, model_max_model_len=131072, model_load_format='auto', model_attention_backend='fa_vattn', model_block_size=2097152, request_generator_provider='synthetic', synthetic_request_generator_length_provider='trace', synthetic_request_generator_interval_provider='static', synthetic_request_generator_num_requests=64, trace_request_generator_trace_file='./data/processed_traces/sydney_enterprise.csv', trace_request_generator_date='2023-08-21', trace_request_generator_prefill_scale_factor=0.3, trace_request_generator_decode_scale_factor=1, trace_request_generator_time_scale_factor=0.04, trace_request_generator_max_tokens=32768, trace_request_length_generator_trace_file='./data/processed_traces/arxiv_summarization_filtered_stats_llama2_tokenizer.csv', trace_request_length_generator_prefill_scale_factor=1, trace_request_length_generator_decode_scale_factor=1, trace_request_length_generator_max_tokens=32768, trace_request_length_generator_min_tokens=8192, trace_request_interval_generator_trace_file='./data/processed_traces/AzureFunctionsInvocationTraceForTwoWeeksJan2021Processed.csv', trace_request_interval_generator_start_time='1970-01-04 12:00:00', trace_request_interval_generator_end_time='1970-01-04 15:00:00', trace_request_interval_generator_time_scale_factor=0.3, poisson_request_interval_generator_qps=1.0, gamma_request_interval_generator_cv=0.5, gamma_request_interval_generator_qps=0.2, zipf_request_length_generator_theta=0.6, zipf_request_length_generator_scramble=False, zipf_request_length_generator_min_tokens=1024, zipf_request_length_generator_max_tokens=4096, zipf_request_length_generator_prefill_to_decode_ratio=20.0, uniform_request_length_generator_min_tokens=1024, uniform_request_length_generator_max_tokens=4096, uniform_request_length_generator_prefill_to_decode_ratio=20.0, fixed_request_length_generator_prefill_tokens=4096, fixed_request_length_generator_decode_tokens=512, replica_scheduler_provider='vllm', replica_scheduler_max_batch_size=128, sarathi_scheduler_chunk_size=512, sarathi_scheduler_enable_dynamic_chunking_schedule=False, sarathi_scheduler_low_chunk_size=128, sarathi_scheduler_high_chunk_size=2048, sarathi_scheduler_chunk_schedule_max_tokens=131072, sarathi_scheduler_chunk_schedule_stages=16, vllm_scheduler_max_tokens_in_batch=None, simple_chunking_scheduler_chunk_size=512, metrics_store_wandb_project='', metrics_store_wandb_sweep_id='', metrics_store_wandb_run_id='', metrics_store_wandb_group='', metrics_store_wandb_run_name='', metrics_store_enable_op_level_metrics=False, metrics_store_enable_cpu_op_level_metrics=False, metrics_store_enable_request_outputs=False, metrics_store_keep_individual_batch_metrics=False)
+2097152
+WARNING 04-06 17:23:57 config.py:1010] Casting torch.bfloat16 to torch.float16.
+INFO 04-06 17:23:57 base_llm_engine.py:70] Initializing an LLM engine with config: model='mistralai/Mistral-Nemo-Base-2407', tokenizer='mistralai/Mistral-Nemo-Base-2407', tokenizer_mode=auto, revision=None, trust_remote_code=True, dtype=torch.float16, download_dir=None, load_format=auto, tensor_parallel_size=4, pipeline_parallel_size=1, seed=42, attention_backend=fa_vattn)
+2026-04-06 17:23:59,234	INFO worker.py:2007 -- Started a local Ray instance.
+/usr/local/lib/python3.10/dist-packages/ray/_private/worker.py:2046: FutureWarning: Tip: In future versions of Ray, Ray will no longer override accelerator visible devices env var if num_gpus=0 or num_gpus=None (default). To enable this behavior and turn off this error message, set RAY_ACCEL_ENV_VAR_OVERRIDE_ON_ZERO=0
+  warnings.warn(
+INFO 04-06 17:24:00 base_llm_engine.py:146] Starting workers with resource mapping: [(None, 0), (None, 1), (None, 2), (None, 3)]
+INFO 04-06 17:24:00 base_llm_engine.py:189] Initializing workers with distributed init method: tcp://192.168.0.17:57846
+[36m(RayWorker pid=22891)[0m INFO 04-06 17:24:03 base_worker.py:97] Worker 0 is using device 0
+[36m(RayWorker pid=22891)[0m INFO 04-06 17:24:05 base_worker.py:116] Initializing worker 0 on device cuda:0, tensor parallel rank 0 and pipeline parallel rank 0.
+[36m(RayWorker pid=22893)[0m INFO 04-06 17:24:13 base_worker.py:132] Model initialized on worker 1.
+[36m(RayWorker pid=22898)[0m INFO 04-06 17:24:03 base_worker.py:97] Worker 3 is using device 3[32m [repeated 3x across cluster] (Ray deduplicates logs by default. Set RAY_DEDUP_LOGS=0 to disable log deduplication, or see https://docs.ray.io/en/master/ray-observability/user-guides/configure-logging.html#log-deduplication for more options.)[0m
+[36m(RayWorker pid=22898)[0m INFO 04-06 17:24:05 base_worker.py:116] Initializing worker 3 on device cuda:3, tensor parallel rank 3 and pipeline parallel rank 0.[32m [repeated 3x across cluster][0m
+[36m(pid=gcs_server)[0m [2026-04-06 17:24:28,092 E 22593 22593] (gcs_server) gcs_server.cc:303: Failed to establish connection to the event+metrics exporter agent. Events and metrics will not be exported. Exporter agent status: RpcError: Running out of retries to initialize the metrics agent. rpc_code: 14
+[33m(raylet)[0m [2026-04-06 17:24:29,172 E 22799 22799] (raylet) main.cc:1032: Failed to establish connection to the metrics exporter agent. Metrics will not be exported. Exporter agent status: RpcError: Running out of retries to initialize the metrics agent. rpc_code: 14
+[36m(RayWorker pid=22898)[0m [2026-04-06 17:24:29,953 E 22898 23705] core_worker_process.cc:842: Failed to establish connection to the metrics exporter agent. Metrics will not be exported. Exporter agent status: RpcError: Running out of retries to initialize the metrics agent. rpc_code: 14
+[2026-04-06 17:24:30,668 E 22505 22890] core_worker_process.cc:842: Failed to establish connection to the metrics exporter agent. Metrics will not be exported. Exporter agent status: RpcError: Running out of retries to initialize the metrics agent. rpc_code: 14
+INFO 04-06 17:24:46 base_llm_engine.py:255] # GPU blocks: 34
+[36m(RayWorker pid=22891)[0m 
+[36m(RayWorker pid=22891)[0m [PYTHON TRACE] Initializing KV Cache:
+[36m(RayWorker pid=22891)[0m  > Architecture: dense_kv
+[36m(RayWorker pid=22891)[0m  > Layers: 40, Heads: 2, Head Size: 128
+[36m(RayWorker pid=22891)[0m  > Max Batch: 128, Max Seq: 131072
+[36m(RayWorker pid=22891)[0m  > MegaCache Enabled: False
+[36m(RayWorker pid=22891)[0m  > Tokens Per Page: 4096
+[36m(RayWorker pid=22891)[0m  > Page Buffer Token Bytes: 512
+[36m(RayWorker pid=22891)[0m [PYTHON TRACE] Reserving Physical Memory: 5440.00 MB
+[36m(RayWorker pid=22898)[0m INFO 04-06 17:24:14 base_worker.py:132] Model initialized on worker 3.[32m [repeated 3x across cluster][0m
+[36m(RayWorker pid=22893)[0m 
+[36m(RayWorker pid=22894)[0m 
+[36m(RayWorker pid=22898)[0m 
+WARNING 04-06 17:24:47 serving_chat.py:100] No chat template provided. Chat API will not work.
+INFO:     Started server process [22505]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:45594 - "GET /v1/models HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45602 - "GET /v1/models HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45606 - "GET /v1/models HTTP/1.1" 200 OK
+INFO 04-06 17:24:50 async_llm_engine.py:393] Received request cmpl-aaaee24baa5e49479bd2526c4af93828-0: prompt: <4085 prompt tokens>, sampling_params: SamplingParams(temperature=0.0, top_p=1.0, top_k=-1, stop=[], ignore_eos=False, max_tokens=1)
+[36m(RayWorker pid=22891)[0m [vAttention ALLOC] reqId: 0 | blocks: 1 | sync: true
+INFO:     127.0.0.1:45620 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO 04-06 17:25:21 async_llm_engine.py:393] Received request cmpl-78e376eaf2e044fd83a0131b72e52e86-0: prompt: <4096 prompt tokens>, sampling_params: SamplingParams(temperature=0.0, top_p=1.0, top_k=-1, stop=[], ignore_eos=False, max_tokens=1)
+[36m(RayWorker pid=22891)[0m [vAttention ALLOC] reqId: 0 | blocks: 1 | sync: false
+[36m(RayWorker pid=22898)[0m [PYTHON TRACE] Initializing KV Cache:[32m [repeated 3x across cluster][0m
+[36m(RayWorker pid=22898)[0m  > Architecture: dense_kv[32m [repeated 3x across cluster][0m
+[36m(RayWorker pid=22898)[0m  > Layers: 40, Heads: 2, Head Size: 128[32m [repeated 3x across cluster][0m
+[36m(RayWorker pid=22898)[0m  > Max Batch: 128, Max Seq: 131072[32m [repeated 3x across cluster][0m
+[36m(RayWorker pid=22898)[0m  > MegaCache Enabled: False[32m [repeated 3x across cluster][0m
+[36m(RayWorker pid=22898)[0m  > Tokens Per Page: 4096[32m [repeated 3x across cluster][0m
+[36m(RayWorker pid=22898)[0m  > Page Buffer Token Bytes: 512[32m [repeated 3x across cluster][0m
+[36m(RayWorker pid=22898)[0m [PYTHON TRACE] Reserving Physical Memory: 5440.00 MB[32m [repeated 3x across cluster][0m
+[36m(RayWorker pid=22898)[0m [vAttention ALLOC] reqId: 0 | blocks: 1 | sync: true[32m [repeated 3x across cluster][0m
+INFO:     127.0.0.1:54562 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO 04-06 17:25:52 async_llm_engine.py:393] Received request cmpl-1d700b6e554c4fc2a92ca1feef93045a-0: prompt: <8181 prompt tokens>, sampling_params: SamplingParams(temperature=0.0, top_p=1.0, top_k=-1, stop=[], ignore_eos=False, max_tokens=1)
+INFO:     127.0.0.1:52184 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO 04-06 17:26:25 async_llm_engine.py:393] Received request cmpl-ad87f54d0b744a589bcc05f6e02f5145-0: prompt: <8192 prompt tokens>, sampling_params: SamplingParams(temperature=0.0, top_p=1.0, top_k=-1, stop=[], ignore_eos=False, max_tokens=1)
+[36m(RayWorker pid=22891)[0m [vAttention ALLOC] reqId: 0 | blocks: 1 | sync: false[32m [repeated 4x across cluster][0m
+INFO:     127.0.0.1:51240 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO 04-06 17:26:57 async_llm_engine.py:393] Received request cmpl-12717604b9ee4933b4b8e50d01c36f2d-0: prompt: <12277 prompt tokens>, sampling_params: SamplingParams(temperature=0.0, top_p=1.0, top_k=-1, stop=[], ignore_eos=False, max_tokens=1)
+INFO:     127.0.0.1:48412 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO 04-06 17:27:31 async_llm_engine.py:393] Received request cmpl-658457a64f50420f946225e4eb1a9b21-0: prompt: <12288 prompt tokens>, sampling_params: SamplingParams(temperature=0.0, top_p=1.0, top_k=-1, stop=[], ignore_eos=False, max_tokens=1)
+[36m(RayWorker pid=22891)[0m [vAttention ALLOC] reqId: 0 | blocks: 1 | sync: false[32m [repeated 4x across cluster][0m
+INFO:     127.0.0.1:56072 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO 04-06 17:28:05 async_llm_engine.py:393] Received request cmpl-33472b00e6c5428094f8ac0e51159f59-0: prompt: <16373 prompt tokens>, sampling_params: SamplingParams(temperature=0.0, top_p=1.0, top_k=-1, stop=[], ignore_eos=False, max_tokens=1)
+INFO:     127.0.0.1:57994 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO 04-06 17:28:40 async_llm_engine.py:393] Received request cmpl-e34dc1df77724eda956bc9781814f632-0: prompt: <16384 prompt tokens>, sampling_params: SamplingParams(temperature=0.0, top_p=1.0, top_k=-1, stop=[], ignore_eos=False, max_tokens=1)
+[36m(RayWorker pid=22891)[0m [vAttention ALLOC] reqId: 0 | blocks: 1 | sync: false[32m [repeated 4x across cluster][0m
+INFO:     127.0.0.1:50916 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO 04-06 17:29:15 async_llm_engine.py:393] Received request cmpl-1b076ba07a4347a2a4a1addebba15360-0: prompt: <20469 prompt tokens>, sampling_params: SamplingParams(temperature=0.0, top_p=1.0, top_k=-1, stop=[], ignore_eos=False, max_tokens=1)
+INFO:     127.0.0.1:54040 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO 04-06 17:29:51 async_llm_engine.py:393] Received request cmpl-a15493cc902349dc993c037d8984c6ad-0: prompt: <20480 prompt tokens>, sampling_params: SamplingParams(temperature=0.0, top_p=1.0, top_k=-1, stop=[], ignore_eos=False, max_tokens=1)
+[36m(RayWorker pid=22891)[0m [vAttention ALLOC] reqId: 0 | blocks: 1 | sync: false[32m [repeated 4x across cluster][0m
+INFO:     127.0.0.1:41136 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO 04-06 17:30:27 async_llm_engine.py:393] Received request cmpl-94b34cde504346f4b527ed2637801059-0: prompt: <24565 prompt tokens>, sampling_params: SamplingParams(temperature=0.0, top_p=1.0, top_k=-1, stop=[], ignore_eos=False, max_tokens=1)
+INFO:     127.0.0.1:38840 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO 04-06 17:31:05 async_llm_engine.py:393] Received request cmpl-d9569f1b63e74d1db47fa2cba129d00c-0: prompt: <24576 prompt tokens>, sampling_params: SamplingParams(temperature=0.0, top_p=1.0, top_k=-1, stop=[], ignore_eos=False, max_tokens=1)
+[36m(RayWorker pid=22891)[0m [vAttention ALLOC] reqId: 0 | blocks: 1 | sync: false[32m [repeated 4x across cluster][0m
+INFO:     127.0.0.1:58162 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO 04-06 17:31:42 async_llm_engine.py:393] Received request cmpl-76b98d206ca8451593dd06af9f243b31-0: prompt: <28651 prompt tokens>, sampling_params: SamplingParams(temperature=0.0, top_p=1.0, top_k=-1, stop=[], ignore_eos=False, max_tokens=1)
+INFO:     127.0.0.1:59336 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO 04-06 17:32:21 async_llm_engine.py:393] Received request cmpl-bb259dc71b95439e84fe35ea4cd71dc5-0: prompt: <28672 prompt tokens>, sampling_params: SamplingParams(temperature=0.0, top_p=1.0, top_k=-1, stop=[], ignore_eos=False, max_tokens=1)
+[36m(RayWorker pid=22891)[0m [vAttention ALLOC] reqId: 0 | blocks: 1 | sync: false[32m [repeated 4x across cluster][0m
+INFO:     127.0.0.1:56988 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO 04-06 17:32:59 async_llm_engine.py:393] Received request cmpl-3fbeb4fa2f344b12b192a23ece0a670b-0: prompt: <32747 prompt tokens>, sampling_params: SamplingParams(temperature=0.0, top_p=1.0, top_k=-1, stop=[], ignore_eos=False, max_tokens=1)
+INFO:     127.0.0.1:50234 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO 04-06 17:33:40 async_llm_engine.py:393] Received request cmpl-dbf4b4a496054a29a4aa1b12324aaf0b-0: prompt: <32768 prompt tokens>, sampling_params: SamplingParams(temperature=0.0, top_p=1.0, top_k=-1, stop=[], ignore_eos=False, max_tokens=1)
+[36m(RayWorker pid=22891)[0m [vAttention ALLOC] reqId: 0 | blocks: 1 | sync: false[32m [repeated 4x across cluster][0m
+INFO:     127.0.0.1:53470 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO 04-06 17:34:20 async_llm_engine.py:393] Received request cmpl-ef62af86f261418299aa118872006426-0: prompt: <36843 prompt tokens>, sampling_params: SamplingParams(temperature=0.0, top_p=1.0, top_k=-1, stop=[], ignore_eos=False, max_tokens=1)
+INFO:     127.0.0.1:32876 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO 04-06 17:35:02 async_llm_engine.py:393] Received request cmpl-dfa0ee47e8794291841979574fe0efa0-0: prompt: <36864 prompt tokens>, sampling_params: SamplingParams(temperature=0.0, top_p=1.0, top_k=-1, stop=[], ignore_eos=False, max_tokens=1)
+[36m(RayWorker pid=22891)[0m [vAttention ALLOC] reqId: 0 | blocks: 1 | sync: false[32m [repeated 4x across cluster][0m
+INFO:     127.0.0.1:55952 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO 04-06 17:35:44 async_llm_engine.py:393] Received request cmpl-d0244abd3f00417aa15158fb757fc207-0: prompt: <40939 prompt tokens>, sampling_params: SamplingParams(temperature=0.0, top_p=1.0, top_k=-1, stop=[], ignore_eos=False, max_tokens=1)
+INFO:     127.0.0.1:41654 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO 04-06 17:36:27 async_llm_engine.py:393] Received request cmpl-530d64572ef340babd6f6f119cdc3bf1-0: prompt: <40960 prompt tokens>, sampling_params: SamplingParams(temperature=0.0, top_p=1.0, top_k=-1, stop=[], ignore_eos=False, max_tokens=1)
+[36m(RayWorker pid=22891)[0m [vAttention ALLOC] reqId: 0 | blocks: 1 | sync: false[32m [repeated 4x across cluster][0m
+INFO:     127.0.0.1:35212 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO 04-06 17:37:11 async_llm_engine.py:393] Received request cmpl-d4f64e00367e4e1d844a0fa83cef7da0-0: prompt: <45035 prompt tokens>, sampling_params: SamplingParams(temperature=0.0, top_p=1.0, top_k=-1, stop=[], ignore_eos=False, max_tokens=1)
+INFO:     127.0.0.1:39582 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO 04-06 17:37:56 async_llm_engine.py:393] Received request cmpl-e06f94df4b5b4ccfa6061bd17afc3694-0: prompt: <45056 prompt tokens>, sampling_params: SamplingParams(temperature=0.0, top_p=1.0, top_k=-1, stop=[], ignore_eos=False, max_tokens=1)
+[36m(RayWorker pid=22891)[0m [vAttention ALLOC] reqId: 0 | blocks: 1 | sync: false[32m [repeated 4x across cluster][0m
+INFO:     127.0.0.1:50944 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO 04-06 17:38:41 async_llm_engine.py:393] Received request cmpl-499ff881bb51442dab044f1818925baa-0: prompt: <49131 prompt tokens>, sampling_params: SamplingParams(temperature=0.0, top_p=1.0, top_k=-1, stop=[], ignore_eos=False, max_tokens=1)
+INFO:     127.0.0.1:40016 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO 04-06 17:39:28 async_llm_engine.py:393] Received request cmpl-affd8d049fea4ed3a1c25ff2d45c1a47-0: prompt: <49152 prompt tokens>, sampling_params: SamplingParams(temperature=0.0, top_p=1.0, top_k=-1, stop=[], ignore_eos=False, max_tokens=1)
+[36m(RayWorker pid=22891)[0m [vAttention ALLOC] reqId: 0 | blocks: 1 | sync: false[32m [repeated 4x across cluster][0m
+INFO:     127.0.0.1:54638 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO 04-06 17:40:15 async_llm_engine.py:393] Received request cmpl-40234d7c7a8d45d3950d1570f661ce6a-0: prompt: <53227 prompt tokens>, sampling_params: SamplingParams(temperature=0.0, top_p=1.0, top_k=-1, stop=[], ignore_eos=False, max_tokens=1)
+INFO:     127.0.0.1:36750 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO 04-06 17:41:03 async_llm_engine.py:393] Received request cmpl-9c44cce3a5f84e068db513a8d417d9f2-0: prompt: <53248 prompt tokens>, sampling_params: SamplingParams(temperature=0.0, top_p=1.0, top_k=-1, stop=[], ignore_eos=False, max_tokens=1)
+[36m(RayWorker pid=22891)[0m [vAttention ALLOC] reqId: 0 | blocks: 1 | sync: false[32m [repeated 4x across cluster][0m
+INFO:     127.0.0.1:46104 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO 04-06 17:41:52 async_llm_engine.py:393] Received request cmpl-c68dd92800f94c0da6ef15adc0976019-0: prompt: <57323 prompt tokens>, sampling_params: SamplingParams(temperature=0.0, top_p=1.0, top_k=-1, stop=[], ignore_eos=False, max_tokens=1)
+INFO:     127.0.0.1:53526 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO 04-06 17:42:42 async_llm_engine.py:393] Received request cmpl-4955fd649ab6424e8fd08877733de61c-0: prompt: <57344 prompt tokens>, sampling_params: SamplingParams(temperature=0.0, top_p=1.0, top_k=-1, stop=[], ignore_eos=False, max_tokens=1)
+[36m(RayWorker pid=22891)[0m [vAttention ALLOC] reqId: 0 | blocks: 1 | sync: false[32m [repeated 4x across cluster][0m
+INFO:     127.0.0.1:44020 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO 04-06 17:43:32 async_llm_engine.py:393] Received request cmpl-3f3bfe37608b486a9dd3a2843e55bc0d-0: prompt: <61419 prompt tokens>, sampling_params: SamplingParams(temperature=0.0, top_p=1.0, top_k=-1, stop=[], ignore_eos=False, max_tokens=1)
+INFO:     127.0.0.1:59188 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO 04-06 17:44:24 async_llm_engine.py:393] Received request cmpl-d8c0270672b644c191f213abc9572f23-0: prompt: <61440 prompt tokens>, sampling_params: SamplingParams(temperature=0.0, top_p=1.0, top_k=-1, stop=[], ignore_eos=False, max_tokens=1)
+[36m(RayWorker pid=22891)[0m [vAttention ALLOC] reqId: 0 | blocks: 1 | sync: false[32m [repeated 4x across cluster][0m
+INFO:     127.0.0.1:43280 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO 04-06 17:45:16 async_llm_engine.py:393] Received request cmpl-08d30e7e3e014d8d98a13bdfa9203413-0: prompt: <65505 prompt tokens>, sampling_params: SamplingParams(temperature=0.0, top_p=1.0, top_k=-1, stop=[], ignore_eos=False, max_tokens=1)
+INFO:     127.0.0.1:36740 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO 04-06 17:46:10 async_llm_engine.py:393] Received request cmpl-dff250b6513f48a58f933419c78a6bbe-0: prompt: <65536 prompt tokens>, sampling_params: SamplingParams(temperature=0.0, top_p=1.0, top_k=-1, stop=[], ignore_eos=False, max_tokens=1)
+[36m(RayWorker pid=22891)[0m [vAttention ALLOC] reqId: 0 | blocks: 1 | sync: false[32m [repeated 4x across cluster][0m
+INFO:     127.0.0.1:54626 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO 04-06 17:47:04 async_llm_engine.py:393] Received request cmpl-3674893c93e6467bae48e7813f841b22-0: prompt: <69601 prompt tokens>, sampling_params: SamplingParams(temperature=0.0, top_p=1.0, top_k=-1, stop=[], ignore_eos=False, max_tokens=1)
+INFO:     127.0.0.1:43420 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO 04-06 17:47:59 async_llm_engine.py:393] Received request cmpl-16eb05e995a84af5a66de56965a3869e-0: prompt: <69632 prompt tokens>, sampling_params: SamplingParams(temperature=0.0, top_p=1.0, top_k=-1, stop=[], ignore_eos=False, max_tokens=1)
+[36m(RayWorker pid=22891)[0m [vAttention ALLOC] reqId: 0 | blocks: 1 | sync: false[32m [repeated 4x across cluster][0m
+INFO:     127.0.0.1:37494 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO 04-06 17:48:55 async_llm_engine.py:393] Received request cmpl-b2feb790e95440d8b58a28cff93c3aef-0: prompt: <73697 prompt tokens>, sampling_params: SamplingParams(temperature=0.0, top_p=1.0, top_k=-1, stop=[], ignore_eos=False, max_tokens=1)
+INFO:     127.0.0.1:58112 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO 04-06 17:49:52 async_llm_engine.py:393] Received request cmpl-1e6f1a56b5084ac68f2f17e10090e7aa-0: prompt: <73728 prompt tokens>, sampling_params: SamplingParams(temperature=0.0, top_p=1.0, top_k=-1, stop=[], ignore_eos=False, max_tokens=1)
+[36m(RayWorker pid=22891)[0m [vAttention ALLOC] reqId: 0 | blocks: 1 | sync: false[32m [repeated 4x across cluster][0m
+INFO:     127.0.0.1:57250 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO 04-06 17:50:50 async_llm_engine.py:393] Received request cmpl-f36096a6afd34f2c9d3f05def4931c8d-0: prompt: <77793 prompt tokens>, sampling_params: SamplingParams(temperature=0.0, top_p=1.0, top_k=-1, stop=[], ignore_eos=False, max_tokens=1)
+INFO:     127.0.0.1:48290 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO 04-06 17:51:50 async_llm_engine.py:393] Received request cmpl-2ba57b89795e49088136237f22f32ac9-0: prompt: <77824 prompt tokens>, sampling_params: SamplingParams(temperature=0.0, top_p=1.0, top_k=-1, stop=[], ignore_eos=False, max_tokens=1)
+[36m(RayWorker pid=22891)[0m [vAttention ALLOC] reqId: 0 | blocks: 1 | sync: false[32m [repeated 4x across cluster][0m
+INFO:     127.0.0.1:37694 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO 04-06 17:52:49 async_llm_engine.py:393] Received request cmpl-9825921a7072469b99fe0fe98b50a2b0-0: prompt: <81889 prompt tokens>, sampling_params: SamplingParams(temperature=0.0, top_p=1.0, top_k=-1, stop=[], ignore_eos=False, max_tokens=1)
+INFO:     127.0.0.1:44850 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO 04-06 17:53:51 async_llm_engine.py:393] Received request cmpl-236fd2e1b0ad4fb084fc8276943868d0-0: prompt: <81920 prompt tokens>, sampling_params: SamplingParams(temperature=0.0, top_p=1.0, top_k=-1, stop=[], ignore_eos=False, max_tokens=1)
+[36m(RayWorker pid=22891)[0m [vAttention ALLOC] reqId: 0 | blocks: 1 | sync: false[32m [repeated 4x across cluster][0m
+INFO:     127.0.0.1:46484 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO 04-06 17:54:53 async_llm_engine.py:393] Received request cmpl-23734b028f0d4646b9cafc1843c485b7-0: prompt: <85865 prompt tokens>, sampling_params: SamplingParams(temperature=0.0, top_p=1.0, top_k=-1, stop=[], ignore_eos=False, max_tokens=1)
+INFO:     127.0.0.1:56538 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO 04-06 17:55:56 async_llm_engine.py:393] Received request cmpl-bddfa79ae8934ad586701e42f160b304-0: prompt: <86016 prompt tokens>, sampling_params: SamplingParams(temperature=0.0, top_p=1.0, top_k=-1, stop=[], ignore_eos=False, max_tokens=1)
+[36m(RayWorker pid=22891)[0m [vAttention ALLOC] reqId: 0 | blocks: 1 | sync: false[32m [repeated 4x across cluster][0m
+INFO:     127.0.0.1:58526 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO 04-06 17:57:00 async_llm_engine.py:393] Received request cmpl-b371c645df0a4ea8b6217f190901feee-0: prompt: <90071 prompt tokens>, sampling_params: SamplingParams(temperature=0.0, top_p=1.0, top_k=-1, stop=[], ignore_eos=False, max_tokens=1)
+INFO:     127.0.0.1:44038 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO 04-06 17:58:07 async_llm_engine.py:393] Received request cmpl-cb026e233e624d72ac333ad260c918d1-0: prompt: <90112 prompt tokens>, sampling_params: SamplingParams(temperature=0.0, top_p=1.0, top_k=-1, stop=[], ignore_eos=False, max_tokens=1)
+[36m(RayWorker pid=22891)[0m [vAttention ALLOC] reqId: 0 | blocks: 1 | sync: false[32m [repeated 4x across cluster][0m
+INFO:     127.0.0.1:53964 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO 04-06 17:59:13 async_llm_engine.py:393] Received request cmpl-7733eb44eaf2476ab545e975bd65ef73-0: prompt: <94160 prompt tokens>, sampling_params: SamplingParams(temperature=0.0, top_p=1.0, top_k=-1, stop=[], ignore_eos=False, max_tokens=1)
+INFO:     127.0.0.1:59778 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO 04-06 18:00:23 async_llm_engine.py:393] Received request cmpl-21d885e5723e40d0aa48d3a5a10914a8-0: prompt: <94208 prompt tokens>, sampling_params: SamplingParams(temperature=0.0, top_p=1.0, top_k=-1, stop=[], ignore_eos=False, max_tokens=1)
+[36m(RayWorker pid=22891)[0m [vAttention ALLOC] reqId: 0 | blocks: 1 | sync: false[32m [repeated 4x across cluster][0m
+INFO:     127.0.0.1:55182 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO 04-06 18:01:31 async_llm_engine.py:393] Received request cmpl-ad818ff1156148198450e8738af8f3a3-0: prompt: <98203 prompt tokens>, sampling_params: SamplingParams(temperature=0.0, top_p=1.0, top_k=-1, stop=[], ignore_eos=False, max_tokens=1)
+INFO:     127.0.0.1:45940 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO 04-06 18:02:42 async_llm_engine.py:393] Received request cmpl-fd8da62e506948fa9aee8d15c39ee89e-0: prompt: <98304 prompt tokens>, sampling_params: SamplingParams(temperature=0.0, top_p=1.0, top_k=-1, stop=[], ignore_eos=False, max_tokens=1)
+[36m(RayWorker pid=22891)[0m [vAttention ALLOC] reqId: 0 | blocks: 1 | sync: false[32m [repeated 4x across cluster][0m
+INFO:     127.0.0.1:44296 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO 04-06 18:03:54 async_llm_engine.py:393] Received request cmpl-5a7e01581ac64384aefe188becfcb0c8-0: prompt: <102299 prompt tokens>, sampling_params: SamplingParams(temperature=0.0, top_p=1.0, top_k=-1, stop=[], ignore_eos=False, max_tokens=1)
+INFO:     127.0.0.1:43508 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO 04-06 18:05:08 async_llm_engine.py:393] Received request cmpl-37fbad98383b45868a206fabeaa79e35-0: prompt: <102400 prompt tokens>, sampling_params: SamplingParams(temperature=0.0, top_p=1.0, top_k=-1, stop=[], ignore_eos=False, max_tokens=1)
+[36m(RayWorker pid=22891)[0m [vAttention ALLOC] reqId: 0 | blocks: 1 | sync: false[32m [repeated 4x across cluster][0m
+INFO:     127.0.0.1:47038 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO 04-06 18:06:26 async_llm_engine.py:393] Received request cmpl-5e77aeecdc504bb2a025cbe3a01428fb-0: prompt: <106475 prompt tokens>, sampling_params: SamplingParams(temperature=0.0, top_p=1.0, top_k=-1, stop=[], ignore_eos=False, max_tokens=1)
+INFO:     127.0.0.1:53554 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO 04-06 18:07:44 async_llm_engine.py:393] Received request cmpl-94d478fa137d4191ad72ef7c3b87ae9f-0: prompt: <106496 prompt tokens>, sampling_params: SamplingParams(temperature=0.0, top_p=1.0, top_k=-1, stop=[], ignore_eos=False, max_tokens=1)
+[36m(RayWorker pid=22891)[0m [vAttention ALLOC] reqId: 0 | blocks: 1 | sync: false[32m [repeated 4x across cluster][0m
+INFO:     127.0.0.1:42182 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO 04-06 18:09:04 async_llm_engine.py:393] Received request cmpl-d0e697e0944b487e9882a30ff8260973-0: prompt: <110571 prompt tokens>, sampling_params: SamplingParams(temperature=0.0, top_p=1.0, top_k=-1, stop=[], ignore_eos=False, max_tokens=1)
+INFO:     127.0.0.1:60306 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO 04-06 18:10:22 async_llm_engine.py:393] Received request cmpl-701632a7f7eb43c5bb0e1725d218a101-0: prompt: <110592 prompt tokens>, sampling_params: SamplingParams(temperature=0.0, top_p=1.0, top_k=-1, stop=[], ignore_eos=False, max_tokens=1)
+[36m(RayWorker pid=22891)[0m [vAttention ALLOC] reqId: 0 | blocks: 1 | sync: false[32m [repeated 4x across cluster][0m
+INFO:     127.0.0.1:54858 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO 04-06 18:11:40 async_llm_engine.py:393] Received request cmpl-0f436212b1e449eeba352987889e6452-0: prompt: <114487 prompt tokens>, sampling_params: SamplingParams(temperature=0.0, top_p=1.0, top_k=-1, stop=[], ignore_eos=False, max_tokens=1)
+INFO:     127.0.0.1:40120 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO 04-06 18:13:00 async_llm_engine.py:393] Received request cmpl-39535094394c4bc6ba381cc14c178f56-0: prompt: <114688 prompt tokens>, sampling_params: SamplingParams(temperature=0.0, top_p=1.0, top_k=-1, stop=[], ignore_eos=False, max_tokens=1)
+[36m(RayWorker pid=22891)[0m [vAttention ALLOC] reqId: 0 | blocks: 1 | sync: false[32m [repeated 4x across cluster][0m
+INFO:     127.0.0.1:39038 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO 04-06 18:14:26 async_llm_engine.py:393] Received request cmpl-78cb7cbc880d43149f2c06456c0b72c7-0: prompt: <118583 prompt tokens>, sampling_params: SamplingParams(temperature=0.0, top_p=1.0, top_k=-1, stop=[], ignore_eos=False, max_tokens=1)
+INFO:     127.0.0.1:56462 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO 04-06 18:15:54 async_llm_engine.py:393] Received request cmpl-bd5406052d804575948a88440a5a4a98-0: prompt: <118784 prompt tokens>, sampling_params: SamplingParams(temperature=0.0, top_p=1.0, top_k=-1, stop=[], ignore_eos=False, max_tokens=1)
+[36m(RayWorker pid=22891)[0m [vAttention ALLOC] reqId: 0 | blocks: 1 | sync: false[32m [repeated 4x across cluster][0m
+INFO:     127.0.0.1:36480 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO 04-06 18:17:20 async_llm_engine.py:393] Received request cmpl-370d132b08a4460d8f8dd65fa66ddc59-0: prompt: <122679 prompt tokens>, sampling_params: SamplingParams(temperature=0.0, top_p=1.0, top_k=-1, stop=[], ignore_eos=False, max_tokens=1)
+ERROR 04-06 18:18:20 async_llm_engine.py:372] Engine iteration timed out. This should never happen!
+ERROR 04-06 18:18:20 async_llm_engine.py:199] Engine background task failed
+ERROR 04-06 18:18:20 async_llm_engine.py:199] Traceback (most recent call last):
+ERROR 04-06 18:18:20 async_llm_engine.py:199]   File "/workspace/sarathi-lean/sarathi/engine/async_llm_engine.py", line 350, in engine_step
+ERROR 04-06 18:18:20 async_llm_engine.py:199]     request_outputs = await self.engine.step_async()
+ERROR 04-06 18:18:20 async_llm_engine.py:199]   File "/workspace/sarathi-lean/sarathi/engine/async_llm_engine.py", line 238, in step_async
+ERROR 04-06 18:18:20 async_llm_engine.py:199]     return await asyncio.get_event_loop().run_in_executor(None, self.engine.step)
+ERROR 04-06 18:18:20 async_llm_engine.py:199] asyncio.exceptions.CancelledError
+ERROR 04-06 18:18:20 async_llm_engine.py:199] 
+ERROR 04-06 18:18:20 async_llm_engine.py:199] During handling of the above exception, another exception occurred:
+ERROR 04-06 18:18:20 async_llm_engine.py:199] 
+ERROR 04-06 18:18:20 async_llm_engine.py:199] Traceback (most recent call last):
+ERROR 04-06 18:18:20 async_llm_engine.py:199]   File "/usr/lib/python3.10/asyncio/tasks.py", line 456, in wait_for
+ERROR 04-06 18:18:20 async_llm_engine.py:199]     return fut.result()
+ERROR 04-06 18:18:20 async_llm_engine.py:199] asyncio.exceptions.CancelledError
+ERROR 04-06 18:18:20 async_llm_engine.py:199] 
+ERROR 04-06 18:18:20 async_llm_engine.py:199] The above exception was the direct cause of the following exception:
+ERROR 04-06 18:18:20 async_llm_engine.py:199] 
+ERROR 04-06 18:18:20 async_llm_engine.py:199] Traceback (most recent call last):
+ERROR 04-06 18:18:20 async_llm_engine.py:199]   File "/workspace/sarathi-lean/sarathi/engine/async_llm_engine.py", line 188, in _log_task_completion
+ERROR 04-06 18:18:20 async_llm_engine.py:199]     return_value = task.result()
+ERROR 04-06 18:18:20 async_llm_engine.py:199]   File "/workspace/sarathi-lean/sarathi/engine/async_llm_engine.py", line 370, in run_engine_loop
+ERROR 04-06 18:18:20 async_llm_engine.py:199]     await asyncio.wait_for(self.engine_step(), ENGINE_ITERATION_TIMEOUT_S)
+ERROR 04-06 18:18:20 async_llm_engine.py:199]   File "/usr/lib/python3.10/asyncio/tasks.py", line 458, in wait_for
+ERROR 04-06 18:18:20 async_llm_engine.py:199]     raise exceptions.TimeoutError() from exc
+ERROR 04-06 18:18:20 async_llm_engine.py:199] asyncio.exceptions.TimeoutError
+Exception in callback _log_task_completion(error_callback=<bound method...7fe3a33fb940>>)(<Task finishe...imeoutError()>) at /workspace/sarathi-lean/sarathi/engine/async_llm_engine.py:177
+handle: <Handle _log_task_completion(error_callback=<bound method...7fe3a33fb940>>)(<Task finishe...imeoutError()>) at /workspace/sarathi-lean/sarathi/engine/async_llm_engine.py:177>
+Traceback (most recent call last):
+  File "/workspace/sarathi-lean/sarathi/engine/async_llm_engine.py", line 350, in engine_step
+    request_outputs = await self.engine.step_async()
+  File "/workspace/sarathi-lean/sarathi/engine/async_llm_engine.py", line 238, in step_async
+    return await asyncio.get_event_loop().run_in_executor(None, self.engine.step)
+asyncio.exceptions.CancelledError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/lib/python3.10/asyncio/tasks.py", line 456, in wait_for
+    return fut.result()
+asyncio.exceptions.CancelledError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/workspace/sarathi-lean/sarathi/engine/async_llm_engine.py", line 188, in _log_task_completion
+    return_value = task.result()
+  File "/workspace/sarathi-lean/sarathi/engine/async_llm_engine.py", line 370, in run_engine_loop
+    await asyncio.wait_for(self.engine_step(), ENGINE_ITERATION_TIMEOUT_S)
+  File "/usr/lib/python3.10/asyncio/tasks.py", line 458, in wait_for
+    raise exceptions.TimeoutError() from exc
+asyncio.exceptions.TimeoutError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/lib/python3.10/asyncio/events.py", line 80, in _run
+    self._context.run(self._callback, *self._args)
+  File "/workspace/sarathi-lean/sarathi/engine/async_llm_engine.py", line 201, in _log_task_completion
+    raise RuntimeError(
+RuntimeError: Task finished unexpectedly. This should never happen! Please open an issue on Github. See stack trace above for theactual cause.
+INFO:     127.0.0.1:49344 - "POST /v1/completions HTTP/1.1" 500 Internal Server Error
+ERROR:    Exception in ASGI application
+Traceback (most recent call last):
+  File "/workspace/sarathi-lean/sarathi/engine/async_llm_engine.py", line 350, in engine_step
+    request_outputs = await self.engine.step_async()
+  File "/workspace/sarathi-lean/sarathi/engine/async_llm_engine.py", line 238, in step_async
+    return await asyncio.get_event_loop().run_in_executor(None, self.engine.step)
+asyncio.exceptions.CancelledError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/lib/python3.10/asyncio/tasks.py", line 456, in wait_for
+    return fut.result()
+asyncio.exceptions.CancelledError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/dist-packages/uvicorn/protocols/http/h11_impl.py", line 410, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+  File "/usr/local/lib/python3.10/dist-packages/uvicorn/middleware/proxy_headers.py", line 60, in __call__
+    return await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/dist-packages/fastapi/applications.py", line 1134, in __call__
+    await super().__call__(scope, receive, send)
+  File "/usr/local/lib/python3.10/dist-packages/starlette/applications.py", line 107, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/usr/local/lib/python3.10/dist-packages/starlette/middleware/errors.py", line 186, in __call__
+    raise exc
+  File "/usr/local/lib/python3.10/dist-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/usr/local/lib/python3.10/dist-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/usr/local/lib/python3.10/dist-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/usr/local/lib/python3.10/dist-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/usr/local/lib/python3.10/dist-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/dist-packages/starlette/routing.py", line 716, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/usr/local/lib/python3.10/dist-packages/starlette/routing.py", line 736, in app
+    await route.handle(scope, receive, send)
+  File "/usr/local/lib/python3.10/dist-packages/starlette/routing.py", line 290, in handle
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/dist-packages/fastapi/routing.py", line 119, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/usr/local/lib/python3.10/dist-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/usr/local/lib/python3.10/dist-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/usr/local/lib/python3.10/dist-packages/fastapi/routing.py", line 105, in app
+    response = await f(request)
+  File "/usr/local/lib/python3.10/dist-packages/fastapi/routing.py", line 424, in app
+    raw_response = await run_endpoint_function(
+  File "/usr/local/lib/python3.10/dist-packages/fastapi/routing.py", line 312, in run_endpoint_function
+    return await dependant.call(**values)
+  File "/workspace/sarathi-lean/sarathi/entrypoints/openai_server/api_server.py", line 92, in create_completion
+    generator = await openai_serving_completion.create_completion(request, raw_request)
+  File "/workspace/sarathi-lean/sarathi/entrypoints/openai_server/serving_completion.py", line 122, in create_completion
+    async for i, res in result_generator:
+  File "/workspace/sarathi-lean/sarathi/utils/__init__.py", line 117, in consumer
+    raise e
+  File "/workspace/sarathi-lean/sarathi/utils/__init__.py", line 108, in consumer
+    raise item
+  File "/workspace/sarathi-lean/sarathi/utils/__init__.py", line 92, in producer
+    async for item in iterator:
+  File "/workspace/sarathi-lean/sarathi/engine/async_llm_engine.py", line 474, in generate
+    async for output in self._process_request(
+  File "/workspace/sarathi-lean/sarathi/engine/async_llm_engine.py", line 505, in _process_request
+    raise e
+  File "/workspace/sarathi-lean/sarathi/engine/async_llm_engine.py", line 501, in _process_request
+    async for request_output in stream:
+  File "/workspace/sarathi-lean/sarathi/engine/async_llm_engine.py", line 56, in __anext__
+    raise result
+  File "/workspace/sarathi-lean/sarathi/engine/async_llm_engine.py", line 188, in _log_task_completion
+    return_value = task.result()
+  File "/workspace/sarathi-lean/sarathi/engine/async_llm_engine.py", line 370, in run_engine_loop
+    await asyncio.wait_for(self.engine_step(), ENGINE_ITERATION_TIMEOUT_S)
+  File "/usr/lib/python3.10/asyncio/tasks.py", line 458, in wait_for
+    raise exceptions.TimeoutError() from exc
+asyncio.exceptions.TimeoutError
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO 04-06 18:18:21 data_series.py:150] request_inter_arrival_delay: request_inter_arrival_delay stats: min: 31.322614001999682, max: 88.11701968299894, mean: 54.3214266286207, median: 52.15781740600005, 95th percentile: 81.07058495379941, 99th percentile: 87.09287366557038 99.9th percentile: 88.0146050812561
+WARNING 04-06 18:18:21 data_series.py:325] Failed to write plot image /workspace/server-output/mistral-nemo-12b//plots//request_inter_arrival_delay.png (
+WARNING 04-06 18:18:21 data_series.py:325] 
+WARNING 04-06 18:18:21 data_series.py:325] Kaleido requires Google Chrome to be installed.
+WARNING 04-06 18:18:21 data_series.py:325] 
+WARNING 04-06 18:18:21 data_series.py:325] Either download and install Chrome yourself following Google's instructions for your operating system,
+WARNING 04-06 18:18:21 data_series.py:325] or install it from your terminal by running:
+WARNING 04-06 18:18:21 data_series.py:325] 
+WARNING 04-06 18:18:21 data_series.py:325]     $ plotly_get_chrome
+WARNING 04-06 18:18:21 data_series.py:325] 
+WARNING 04-06 18:18:21 data_series.py:325] ); skipping PNG export
+INFO 04-06 18:18:21 data_series.py:150] request_num_tokens: request_num_tokens stats: min: 4086, max: 118785, mean: 61418.65517241379, median: 61430.5, 95th percentile: 114518.15, 99th percentile: 118670.43 99.9th percentile: 118773.543
+WARNING 04-06 18:18:21 data_series.py:325] Failed to write plot image /workspace/server-output/mistral-nemo-12b//plots//request_num_tokens.png (
+WARNING 04-06 18:18:21 data_series.py:325] 
+WARNING 04-06 18:18:21 data_series.py:325] Kaleido requires Google Chrome to be installed.
+WARNING 04-06 18:18:21 data_series.py:325] 
+WARNING 04-06 18:18:21 data_series.py:325] Either download and install Chrome yourself following Google's instructions for your operating system,
+WARNING 04-06 18:18:21 data_series.py:325] or install it from your terminal by running:
+WARNING 04-06 18:18:21 data_series.py:325] 
+WARNING 04-06 18:18:21 data_series.py:325]     $ plotly_get_chrome
+WARNING 04-06 18:18:21 data_series.py:325] 
+WARNING 04-06 18:18:21 data_series.py:325] ); skipping PNG export
+INFO 04-06 18:18:21 data_series.py:150] request_num_prefill_tokens: request_num_prefill_tokens stats: min: 4085, max: 118784, mean: 61417.65517241379, median: 61429.5, 95th percentile: 114517.15, 99th percentile: 118669.43 99.9th percentile: 118772.543
+WARNING 04-06 18:18:21 data_series.py:325] Failed to write plot image /workspace/server-output/mistral-nemo-12b//plots//request_num_prefill_tokens.png (
+WARNING 04-06 18:18:21 data_series.py:325] 
+WARNING 04-06 18:18:21 data_series.py:325] Kaleido requires Google Chrome to be installed.
+WARNING 04-06 18:18:21 data_series.py:325] 
+WARNING 04-06 18:18:21 data_series.py:325] Either download and install Chrome yourself following Google's instructions for your operating system,
+WARNING 04-06 18:18:21 data_series.py:325] or install it from your terminal by running:
+WARNING 04-06 18:18:21 data_series.py:325] 
+WARNING 04-06 18:18:21 data_series.py:325]     $ plotly_get_chrome
+WARNING 04-06 18:18:21 data_series.py:325] 
+WARNING 04-06 18:18:21 data_series.py:325] ); skipping PNG export
+INFO 04-06 18:18:21 data_series.py:150] request_num_decode_tokens: request_num_decode_tokens stats: min: 1, max: 1, mean: 1.0, median: 1.0, 95th percentile: 1.0, 99th percentile: 1.0 99.9th percentile: 1.0
+WARNING 04-06 18:18:21 data_series.py:325] Failed to write plot image /workspace/server-output/mistral-nemo-12b//plots//request_num_decode_tokens.png (
+WARNING 04-06 18:18:21 data_series.py:325] 
+WARNING 04-06 18:18:21 data_series.py:325] Kaleido requires Google Chrome to be installed.
+WARNING 04-06 18:18:21 data_series.py:325] 
+WARNING 04-06 18:18:21 data_series.py:325] Either download and install Chrome yourself following Google's instructions for your operating system,
+WARNING 04-06 18:18:21 data_series.py:325] or install it from your terminal by running:
+WARNING 04-06 18:18:21 data_series.py:325] 
+WARNING 04-06 18:18:21 data_series.py:325]     $ plotly_get_chrome
+WARNING 04-06 18:18:21 data_series.py:325] 
+WARNING 04-06 18:18:21 data_series.py:325] ); skipping PNG export
+INFO 04-06 18:18:21 data_series.py:150] request_pd_ratio: request_pd_ratio stats: min: 4085.0, max: 118784.0, mean: 61417.65517241379, median: 61429.5, 95th percentile: 114517.15, 99th percentile: 118669.43 99.9th percentile: 118772.543
+WARNING 04-06 18:18:21 data_series.py:325] Failed to write plot image /workspace/server-output/mistral-nemo-12b//plots//request_pd_ratio.png (
+WARNING 04-06 18:18:21 data_series.py:325] 
+WARNING 04-06 18:18:21 data_series.py:325] Kaleido requires Google Chrome to be installed.
+WARNING 04-06 18:18:21 data_series.py:325] 
+WARNING 04-06 18:18:21 data_series.py:325] Either download and install Chrome yourself following Google's instructions for your operating system,
+WARNING 04-06 18:18:21 data_series.py:325] or install it from your terminal by running:
+WARNING 04-06 18:18:21 data_series.py:325] 
+WARNING 04-06 18:18:21 data_series.py:325]     $ plotly_get_chrome
+WARNING 04-06 18:18:21 data_series.py:325] 
+WARNING 04-06 18:18:21 data_series.py:325] ); skipping PNG export
+INFO 04-06 18:18:21 data_series.py:150] request_num_restarts: request_num_restarts stats: min: 0, max: 0, mean: 0.0, median: 0.0, 95th percentile: 0.0, 99th percentile: 0.0 99.9th percentile: 0.0
+WARNING 04-06 18:18:21 data_series.py:325] Failed to write plot image /workspace/server-output/mistral-nemo-12b//plots//request_num_restarts.png (
+WARNING 04-06 18:18:21 data_series.py:325] 
+WARNING 04-06 18:18:21 data_series.py:325] Kaleido requires Google Chrome to be installed.
+WARNING 04-06 18:18:21 data_series.py:325] 
+WARNING 04-06 18:18:21 data_series.py:325] Either download and install Chrome yourself following Google's instructions for your operating system,
+WARNING 04-06 18:18:21 data_series.py:325] or install it from your terminal by running:
+WARNING 04-06 18:18:21 data_series.py:325] 
+WARNING 04-06 18:18:21 data_series.py:325]     $ plotly_get_chrome
+WARNING 04-06 18:18:21 data_series.py:325] 
+WARNING 04-06 18:18:21 data_series.py:325] ); skipping PNG export
+INFO 04-06 18:18:21 data_series.py:150] request_num_pauses: request_num_pauses stats: min: 2, max: 2, mean: 2.0, median: 2.0, 95th percentile: 2.0, 99th percentile: 2.0 99.9th percentile: 2.0
+WARNING 04-06 18:18:21 data_series.py:325] Failed to write plot image /workspace/server-output/mistral-nemo-12b//plots//request_num_pauses.png (
+WARNING 04-06 18:18:21 data_series.py:325] 
+WARNING 04-06 18:18:21 data_series.py:325] Kaleido requires Google Chrome to be installed.
+WARNING 04-06 18:18:21 data_series.py:325] 
+WARNING 04-06 18:18:21 data_series.py:325] Either download and install Chrome yourself following Google's instructions for your operating system,
+WARNING 04-06 18:18:21 data_series.py:325] or install it from your terminal by running:
+WARNING 04-06 18:18:21 data_series.py:325] 
+WARNING 04-06 18:18:21 data_series.py:325]     $ plotly_get_chrome
+WARNING 04-06 18:18:21 data_series.py:325] 
+WARNING 04-06 18:18:21 data_series.py:325] ); skipping PNG export
+INFO 04-06 18:18:21 data_series.py:150] request_num_ignored: request_num_ignored stats: min: 0, max: 0, mean: 0.0, median: 0.0, 95th percentile: 0.0, 99th percentile: 0.0 99.9th percentile: 0.0
+WARNING 04-06 18:18:21 data_series.py:325] Failed to write plot image /workspace/server-output/mistral-nemo-12b//plots//request_num_ignored.png (
+WARNING 04-06 18:18:21 data_series.py:325] 
+WARNING 04-06 18:18:21 data_series.py:325] Kaleido requires Google Chrome to be installed.
+WARNING 04-06 18:18:21 data_series.py:325] 
+WARNING 04-06 18:18:21 data_series.py:325] Either download and install Chrome yourself following Google's instructions for your operating system,
+WARNING 04-06 18:18:21 data_series.py:325] or install it from your terminal by running:
+WARNING 04-06 18:18:21 data_series.py:325] 
+WARNING 04-06 18:18:21 data_series.py:325]     $ plotly_get_chrome
+WARNING 04-06 18:18:21 data_series.py:325] 
+WARNING 04-06 18:18:21 data_series.py:325] ); skipping PNG export
+INFO 04-06 18:18:21 data_series.py:150] kv_blocks_mapped: kv_blocks_mapped stats: min: 1.0, max: 30.0, mean: 15.5, median: 15.5, 95th percentile: 28.15, 99th percentile: 29.43 99.9th percentile: 29.943000000000005
+WARNING 04-06 18:18:21 data_series.py:325] Failed to write plot image /workspace/server-output/mistral-nemo-12b//plots//kv_blocks_mapped.png (
+WARNING 04-06 18:18:21 data_series.py:325] 
+WARNING 04-06 18:18:21 data_series.py:325] Kaleido requires Google Chrome to be installed.
+WARNING 04-06 18:18:21 data_series.py:325] 
+WARNING 04-06 18:18:21 data_series.py:325] Either download and install Chrome yourself following Google's instructions for your operating system,
+WARNING 04-06 18:18:21 data_series.py:325] or install it from your terminal by running:
+WARNING 04-06 18:18:21 data_series.py:325] 
+WARNING 04-06 18:18:21 data_series.py:325]     $ plotly_get_chrome
+WARNING 04-06 18:18:21 data_series.py:325] 
+WARNING 04-06 18:18:21 data_series.py:325] ); skipping PNG export
+INFO 04-06 18:18:21 data_series.py:150] kv_fragmentation_percent: kv_fragmentation_percent stats: min: 0.018988715277777776, max: 50.0, mean: 5.201205299575309, median: 1.8009440104166667, 95th percentile: 20.749999999999993, 99th percentile: 40.5 99.9th percentile: 49.05000000000008
+WARNING 04-06 18:18:21 data_series.py:325] Failed to write plot image /workspace/server-output/mistral-nemo-12b//plots//kv_fragmentation_percent.png (
+WARNING 04-06 18:18:21 data_series.py:325] 
+WARNING 04-06 18:18:21 data_series.py:325] Kaleido requires Google Chrome to be installed.
+WARNING 04-06 18:18:21 data_series.py:325] 
+WARNING 04-06 18:18:21 data_series.py:325] Either download and install Chrome yourself following Google's instructions for your operating system,
+WARNING 04-06 18:18:21 data_series.py:325] or install it from your terminal by running:
+WARNING 04-06 18:18:21 data_series.py:325] 
+WARNING 04-06 18:18:21 data_series.py:325]     $ plotly_get_chrome
+WARNING 04-06 18:18:21 data_series.py:325] 
+WARNING 04-06 18:18:21 data_series.py:325] ); skipping PNG export
+INFO 04-06 18:18:21 data_series.py:150] request_e2e_time: request_e2e_time stats: min: 1.3181866969998737, max: 58.097246919998724, mean: 24.308515985137923, median: 22.145063685999958, 95th percentile: 51.052508496300554, 99th percentile: 57.07149508545941 99.9th percentile: 57.9946717365448
+WARNING 04-06 18:18:21 data_series.py:279] Failed to write plot image /workspace/server-output/mistral-nemo-12b//plots//request_e2e_time.png (
+WARNING 04-06 18:18:21 data_series.py:279] 
+WARNING 04-06 18:18:21 data_series.py:279] Kaleido requires Google Chrome to be installed.
+WARNING 04-06 18:18:21 data_series.py:279] 
+WARNING 04-06 18:18:21 data_series.py:279] Either download and install Chrome yourself following Google's instructions for your operating system,
+WARNING 04-06 18:18:21 data_series.py:279] or install it from your terminal by running:
+WARNING 04-06 18:18:21 data_series.py:279] 
+WARNING 04-06 18:18:21 data_series.py:279]     $ plotly_get_chrome
+WARNING 04-06 18:18:21 data_series.py:279] 
+WARNING 04-06 18:18:21 data_series.py:279] ); skipping PNG export
+INFO 04-06 18:18:21 data_series.py:150] request_e2e_time_normalized: request_e2e_time_normalized stats: min: 1.3181866969998737, max: 58.097246919998724, mean: 24.308515985137923, median: 22.145063685999958, 95th percentile: 51.052508496300554, 99th percentile: 57.07149508545941 99.9th percentile: 57.9946717365448
+WARNING 04-06 18:18:21 data_series.py:279] Failed to write plot image /workspace/server-output/mistral-nemo-12b//plots//request_e2e_time_normalized.png (
+WARNING 04-06 18:18:21 data_series.py:279] 
+WARNING 04-06 18:18:21 data_series.py:279] Kaleido requires Google Chrome to be installed.
+WARNING 04-06 18:18:21 data_series.py:279] 
+WARNING 04-06 18:18:21 data_series.py:279] Either download and install Chrome yourself following Google's instructions for your operating system,
+WARNING 04-06 18:18:21 data_series.py:279] or install it from your terminal by running:
+WARNING 04-06 18:18:21 data_series.py:279] 
+WARNING 04-06 18:18:21 data_series.py:279]     $ plotly_get_chrome
+WARNING 04-06 18:18:21 data_series.py:279] 
+WARNING 04-06 18:18:21 data_series.py:279] ); skipping PNG export
+INFO 04-06 18:18:21 data_series.py:150] request_e2e_time_piecewise_normalized: request_e2e_time_piecewise_normalized stats: min: 1.3181866969998737, max: 58.097246919998724, mean: 24.308515985137923, median: 22.145063685999958, 95th percentile: 51.052508496300554, 99th percentile: 57.07149508545941 99.9th percentile: 57.9946717365448
+WARNING 04-06 18:18:21 data_series.py:279] Failed to write plot image /workspace/server-output/mistral-nemo-12b//plots//request_e2e_time_piecewise_normalized.png (
+WARNING 04-06 18:18:21 data_series.py:279] 
+WARNING 04-06 18:18:21 data_series.py:279] Kaleido requires Google Chrome to be installed.
+WARNING 04-06 18:18:21 data_series.py:279] 
+WARNING 04-06 18:18:21 data_series.py:279] Either download and install Chrome yourself following Google's instructions for your operating system,
+WARNING 04-06 18:18:21 data_series.py:279] or install it from your terminal by running:
+WARNING 04-06 18:18:21 data_series.py:279] 
+WARNING 04-06 18:18:21 data_series.py:279]     $ plotly_get_chrome
+WARNING 04-06 18:18:21 data_series.py:279] 
+WARNING 04-06 18:18:21 data_series.py:279] ); skipping PNG export
+INFO 04-06 18:18:21 data_series.py:150] request_execution_time: request_execution_time stats: min: 1.3077939939994394, max: 58.022606943997744, mean: 24.256457468844804, median: 22.10512664250018, 95th percentile: 50.985219814651636, 99th percentile: 56.99697047574899 99.9th percentile: 57.920043297172874
+WARNING 04-06 18:18:21 data_series.py:279] Failed to write plot image /workspace/server-output/mistral-nemo-12b//plots//request_execution_time.png (
+WARNING 04-06 18:18:21 data_series.py:279] 
+WARNING 04-06 18:18:21 data_series.py:279] Kaleido requires Google Chrome to be installed.
+WARNING 04-06 18:18:21 data_series.py:279] 
+WARNING 04-06 18:18:21 data_series.py:279] Either download and install Chrome yourself following Google's instructions for your operating system,
+WARNING 04-06 18:18:21 data_series.py:279] or install it from your terminal by running:
+WARNING 04-06 18:18:21 data_series.py:279] 
+WARNING 04-06 18:18:21 data_series.py:279]     $ plotly_get_chrome
+WARNING 04-06 18:18:21 data_series.py:279] 
+WARNING 04-06 18:18:21 data_series.py:279] ); skipping PNG export
+INFO 04-06 18:18:21 data_series.py:150] request_execution_time_normalized: request_execution_time_normalized stats: min: 1.3077939939994394, max: 58.022606943997744, mean: 24.256457468844804, median: 22.10512664250018, 95th percentile: 50.985219814651636, 99th percentile: 56.99697047574899 99.9th percentile: 57.920043297172874
+WARNING 04-06 18:18:21 data_series.py:279] Failed to write plot image /workspace/server-output/mistral-nemo-12b//plots//request_execution_time_normalized.png (
+WARNING 04-06 18:18:21 data_series.py:279] 
+WARNING 04-06 18:18:21 data_series.py:279] Kaleido requires Google Chrome to be installed.
+WARNING 04-06 18:18:21 data_series.py:279] 
+WARNING 04-06 18:18:21 data_series.py:279] Either download and install Chrome yourself following Google's instructions for your operating system,
+WARNING 04-06 18:18:21 data_series.py:279] or install it from your terminal by running:
+WARNING 04-06 18:18:21 data_series.py:279] 
+WARNING 04-06 18:18:21 data_series.py:279]     $ plotly_get_chrome
+WARNING 04-06 18:18:21 data_series.py:279] 
+WARNING 04-06 18:18:21 data_series.py:279] ); skipping PNG export
+INFO 04-06 18:18:21 data_series.py:150] request_preemption_time: request_preemption_time stats: min: 0.0029168189994379645, max: 0.07037748099992314, mean: 0.04083125179309279, median: 0.05325752850012577, 95th percentile: 0.06923111859923665, 99th percentile: 0.0699451804597993 99.9th percentile: 0.07033425094591075
+WARNING 04-06 18:18:21 data_series.py:279] Failed to write plot image /workspace/server-output/mistral-nemo-12b//plots//request_preemption_time.png (
+WARNING 04-06 18:18:21 data_series.py:279] 
+WARNING 04-06 18:18:21 data_series.py:279] Kaleido requires Google Chrome to be installed.
+WARNING 04-06 18:18:21 data_series.py:279] 
+WARNING 04-06 18:18:21 data_series.py:279] Either download and install Chrome yourself following Google's instructions for your operating system,
+WARNING 04-06 18:18:21 data_series.py:279] or install it from your terminal by running:
+WARNING 04-06 18:18:21 data_series.py:279] 
+WARNING 04-06 18:18:21 data_series.py:279]     $ plotly_get_chrome
+WARNING 04-06 18:18:21 data_series.py:279] 
+WARNING 04-06 18:18:21 data_series.py:279] ); skipping PNG export
+INFO 04-06 18:18:21 data_series.py:150] request_scheduling_delay: request_scheduling_delay stats: min: 0.0029451390000758693, max: 0.021946685999864712, mean: 0.01122726450002715, median: 0.011084204999860958, 95th percentile: 0.01851706695015309, 99th percentile: 0.021740975849816095 99.9th percentile: 0.021926114984859853
+WARNING 04-06 18:18:21 data_series.py:279] Failed to write plot image /workspace/server-output/mistral-nemo-12b//plots//request_scheduling_delay.png (
+WARNING 04-06 18:18:21 data_series.py:279] 
+WARNING 04-06 18:18:21 data_series.py:279] Kaleido requires Google Chrome to be installed.
+WARNING 04-06 18:18:21 data_series.py:279] 
+WARNING 04-06 18:18:21 data_series.py:279] Either download and install Chrome yourself following Google's instructions for your operating system,
+WARNING 04-06 18:18:21 data_series.py:279] or install it from your terminal by running:
+WARNING 04-06 18:18:21 data_series.py:279] 
+WARNING 04-06 18:18:21 data_series.py:279]     $ plotly_get_chrome
+WARNING 04-06 18:18:21 data_series.py:279] 
+WARNING 04-06 18:18:21 data_series.py:279] ); skipping PNG export
+INFO 04-06 18:18:21 data_series.py:150] request_execution_plus_preemption_time: request_execution_plus_preemption_time stats: min: 1.3135676210004021, max: 58.08099156099888, mean: 24.297288720637894, median: 22.133937681000134, 95th percentile: 51.035218628249815, 99th percentile: 57.05461767861932 99.9th percentile: 57.97835417276094
+WARNING 04-06 18:18:21 data_series.py:279] Failed to write plot image /workspace/server-output/mistral-nemo-12b//plots//request_execution_plus_preemption_time.png (
+WARNING 04-06 18:18:21 data_series.py:279] 
+WARNING 04-06 18:18:21 data_series.py:279] Kaleido requires Google Chrome to be installed.
+WARNING 04-06 18:18:21 data_series.py:279] 
+WARNING 04-06 18:18:21 data_series.py:279] Either download and install Chrome yourself following Google's instructions for your operating system,
+WARNING 04-06 18:18:21 data_series.py:279] or install it from your terminal by running:
+WARNING 04-06 18:18:21 data_series.py:279] 
+WARNING 04-06 18:18:21 data_series.py:279]     $ plotly_get_chrome
+WARNING 04-06 18:18:21 data_series.py:279] 
+WARNING 04-06 18:18:21 data_series.py:279] ); skipping PNG export
+INFO 04-06 18:18:21 data_series.py:150] request_execution_plus_preemption_time_normalized: request_execution_plus_preemption_time_normalized stats: min: 1.3135676210004021, max: 58.08099156099888, mean: 24.297288720637894, median: 22.133937681000134, 95th percentile: 51.035218628249815, 99th percentile: 57.05461767861932 99.9th percentile: 57.97835417276094
+WARNING 04-06 18:18:21 data_series.py:279] Failed to write plot image /workspace/server-output/mistral-nemo-12b//plots//request_execution_plus_preemption_time_normalized.png (
+WARNING 04-06 18:18:21 data_series.py:279] 
+WARNING 04-06 18:18:21 data_series.py:279] Kaleido requires Google Chrome to be installed.
+WARNING 04-06 18:18:21 data_series.py:279] 
+WARNING 04-06 18:18:21 data_series.py:279] Either download and install Chrome yourself following Google's instructions for your operating system,
+WARNING 04-06 18:18:21 data_series.py:279] or install it from your terminal by running:
+WARNING 04-06 18:18:21 data_series.py:279] 
+WARNING 04-06 18:18:21 data_series.py:279]     $ plotly_get_chrome
+WARNING 04-06 18:18:21 data_series.py:279] 
+WARNING 04-06 18:18:21 data_series.py:279] ); skipping PNG export
+INFO 04-06 18:18:22 data_series.py:150] prefill_e2e_time: prefill_e2e_time stats: min: 1.282778311999209, max: 58.00747405000038, mean: 24.241437388586213, median: 22.09155573049975, 95th percentile: 50.97208698020021, 99th percentile: 56.9845699331809 99.9th percentile: 57.90518363831844
+WARNING 04-06 18:18:22 data_series.py:279] Failed to write plot image /workspace/server-output/mistral-nemo-12b//plots//prefill_e2e_time.png (
+WARNING 04-06 18:18:22 data_series.py:279] 
+WARNING 04-06 18:18:22 data_series.py:279] Kaleido requires Google Chrome to be installed.
+WARNING 04-06 18:18:22 data_series.py:279] 
+WARNING 04-06 18:18:22 data_series.py:279] Either download and install Chrome yourself following Google's instructions for your operating system,
+WARNING 04-06 18:18:22 data_series.py:279] or install it from your terminal by running:
+WARNING 04-06 18:18:22 data_series.py:279] 
+WARNING 04-06 18:18:22 data_series.py:279]     $ plotly_get_chrome
+WARNING 04-06 18:18:22 data_series.py:279] 
+WARNING 04-06 18:18:22 data_series.py:279] ); skipping PNG export
+INFO 04-06 18:18:22 data_series.py:150] prefill_e2e_time_normalized: prefill_e2e_time_normalized stats: min: 0.0002870461291760778, max: 0.0004891719221979574, mean: 0.00036554464784569255, median: 0.0003591054185456181, 95th percentile: 0.0004709676218177561, 99th percentile: 0.0004878553116131352 99.9th percentile: 0.0004890402611394751
+WARNING 04-06 18:18:22 data_series.py:279] Failed to write plot image /workspace/server-output/mistral-nemo-12b//plots//prefill_e2e_time_normalized.png (
+WARNING 04-06 18:18:22 data_series.py:279] 
+WARNING 04-06 18:18:22 data_series.py:279] Kaleido requires Google Chrome to be installed.
+WARNING 04-06 18:18:22 data_series.py:279] 
+WARNING 04-06 18:18:22 data_series.py:279] Either download and install Chrome yourself following Google's instructions for your operating system,
+WARNING 04-06 18:18:22 data_series.py:279] or install it from your terminal by running:
+WARNING 04-06 18:18:22 data_series.py:279] 
+WARNING 04-06 18:18:22 data_series.py:279]     $ plotly_get_chrome
+WARNING 04-06 18:18:22 data_series.py:279] 
+WARNING 04-06 18:18:22 data_series.py:279] ); skipping PNG export
+INFO 04-06 18:18:22 data_series.py:150] prefill_e2e_time_piecewise_normalized: prefill_e2e_time_piecewise_normalized stats: min: 0.0032585787276149247, max: 0.022339315989639365, mean: 0.01159257028619683, median: 0.011450496843471061, 95th percentile: 0.018970935475728416, 99th percentile: 0.022141698608370116 99.9th percentile: 0.02231955425151244
+WARNING 04-06 18:18:22 data_series.py:279] Failed to write plot image /workspace/server-output/mistral-nemo-12b//plots//prefill_e2e_time_piecewise_normalized.png (
+WARNING 04-06 18:18:22 data_series.py:279] 
+WARNING 04-06 18:18:22 data_series.py:279] Kaleido requires Google Chrome to be installed.
+WARNING 04-06 18:18:22 data_series.py:279] 
+WARNING 04-06 18:18:22 data_series.py:279] Either download and install Chrome yourself following Google's instructions for your operating system,
+WARNING 04-06 18:18:22 data_series.py:279] or install it from your terminal by running:
+WARNING 04-06 18:18:22 data_series.py:279] 
+WARNING 04-06 18:18:22 data_series.py:279]     $ plotly_get_chrome
+WARNING 04-06 18:18:22 data_series.py:279] 
+WARNING 04-06 18:18:22 data_series.py:279] ); skipping PNG export
+INFO 04-06 18:18:22 data_series.py:150] prefill_time_execution_plus_preemption: prefill_time_execution_plus_preemption stats: min: 1.2781592359997376, max: 57.99121869100054, mean: 24.230210124086184, median: 22.080429725499926, 95th percentile: 50.95479711214947, 99th percentile: 56.96769252634081 99.9th percentile: 57.888866074534576
+WARNING 04-06 18:18:22 data_series.py:279] Failed to write plot image /workspace/server-output/mistral-nemo-12b//plots//prefill_time_execution_plus_preemption.png (
+WARNING 04-06 18:18:22 data_series.py:279] 
+WARNING 04-06 18:18:22 data_series.py:279] Kaleido requires Google Chrome to be installed.
+WARNING 04-06 18:18:22 data_series.py:279] 
+WARNING 04-06 18:18:22 data_series.py:279] Either download and install Chrome yourself following Google's instructions for your operating system,
+WARNING 04-06 18:18:22 data_series.py:279] or install it from your terminal by running:
+WARNING 04-06 18:18:22 data_series.py:279] 
+WARNING 04-06 18:18:22 data_series.py:279]     $ plotly_get_chrome
+WARNING 04-06 18:18:22 data_series.py:279] 
+WARNING 04-06 18:18:22 data_series.py:279] ); skipping PNG export
+INFO 04-06 18:18:22 data_series.py:150] prefill_time_execution_plus_preemption_normalized: prefill_time_execution_plus_preemption_normalized stats: min: 0.0002865932042387122, max: 0.00048903484218649, mean: 0.0003653057861696786, median: 0.000358928913149642, 95th percentile: 0.00047080743963279274, 99th percentile: 0.00048771141542467355 99.9th percentile: 0.0004889024995103084
+WARNING 04-06 18:18:22 data_series.py:279] Failed to write plot image /workspace/server-output/mistral-nemo-12b//plots//prefill_time_execution_plus_preemption_normalized.png (
+WARNING 04-06 18:18:22 data_series.py:279] 
+WARNING 04-06 18:18:22 data_series.py:279] Kaleido requires Google Chrome to be installed.
+WARNING 04-06 18:18:22 data_series.py:279] 
+WARNING 04-06 18:18:22 data_series.py:279] Either download and install Chrome yourself following Google's instructions for your operating system,
+WARNING 04-06 18:18:22 data_series.py:279] or install it from your terminal by running:
+WARNING 04-06 18:18:22 data_series.py:279] 
+WARNING 04-06 18:18:22 data_series.py:279]     $ plotly_get_chrome
+WARNING 04-06 18:18:22 data_series.py:279] 
+WARNING 04-06 18:18:22 data_series.py:279] ); skipping PNG export
+INFO 04-06 18:18:22 data_series.py:150] decode_time_execution_plus_preemption_normalized: decode_time_execution_plus_preemption_normalized stats: min: 0.027244753000559285, max: 0.09848456399959105, mean: 0.06707859655170978, median: 0.07888208350050263, 95th percentile: 0.0940926980995755, 99th percentile: 0.09749302619958143 99.9th percentile: 0.09838541021959009
+WARNING 04-06 18:18:22 data_series.py:279] Failed to write plot image /workspace/server-output/mistral-nemo-12b//plots//decode_time_execution_plus_preemption_normalized.png (
+WARNING 04-06 18:18:22 data_series.py:279] 
+WARNING 04-06 18:18:22 data_series.py:279] Kaleido requires Google Chrome to be installed.
+WARNING 04-06 18:18:22 data_series.py:279] 
+WARNING 04-06 18:18:22 data_series.py:279] Either download and install Chrome yourself following Google's instructions for your operating system,
+WARNING 04-06 18:18:22 data_series.py:279] or install it from your terminal by running:
+WARNING 04-06 18:18:22 data_series.py:279] 
+WARNING 04-06 18:18:22 data_series.py:279]     $ plotly_get_chrome
+WARNING 04-06 18:18:22 data_series.py:279] 
+WARNING 04-06 18:18:22 data_series.py:279] ); skipping PNG export
+INFO 04-06 18:18:22 cdf_sketch.py:71] batch_execution_time: batch_execution_time stats: min: 0.023603231999913987, max: 60.469955407999805, mean: 12.54166333002571, 25th percentile: 0.025913227725275052, median: 1.2776207787331588, 75th percentile: 22.131468999885865, 95th percentile: 47.990390374500834, 99th percentile: 56.20472583755698 99.9th percentile: 58.03236392716473 count: 117.0 sum: 1467.374609613008
+WARNING 04-06 18:18:22 cdf_sketch.py:163] Failed to write plot image /workspace/server-output/mistral-nemo-12b//plots//batch_execution_time.png (
+WARNING 04-06 18:18:22 cdf_sketch.py:163] 
+WARNING 04-06 18:18:22 cdf_sketch.py:163] Kaleido requires Google Chrome to be installed.
+WARNING 04-06 18:18:22 cdf_sketch.py:163] 
+WARNING 04-06 18:18:22 cdf_sketch.py:163] Either download and install Chrome yourself following Google's instructions for your operating system,
+WARNING 04-06 18:18:22 cdf_sketch.py:163] or install it from your terminal by running:
+WARNING 04-06 18:18:22 cdf_sketch.py:163] 
+WARNING 04-06 18:18:22 cdf_sketch.py:163]     $ plotly_get_chrome
+WARNING 04-06 18:18:22 cdf_sketch.py:163] 
+WARNING 04-06 18:18:22 cdf_sketch.py:163] ); skipping PNG export
+INFO 04-06 18:18:22 cdf_sketch.py:71] inter_batch_delay: inter_batch_delay stats: min: 0.002513213999918662, max: 30.069953555999746, mean: 15.032594330818899, 25th percentile: 0.05270729115059698, median: 0.07001810788361293, 75th percentile: 29.99409814075676, 95th percentile: 30.0541463852828, 99th percentile: 30.0541463852828 99.9th percentile: 30.0541463852828 count: 116.0 sum: 1743.7809423749923
+WARNING 04-06 18:18:22 cdf_sketch.py:163] Failed to write plot image /workspace/server-output/mistral-nemo-12b//plots//inter_batch_delay.png (
+WARNING 04-06 18:18:22 cdf_sketch.py:163] 
+WARNING 04-06 18:18:22 cdf_sketch.py:163] Kaleido requires Google Chrome to be installed.
+WARNING 04-06 18:18:22 cdf_sketch.py:163] 
+WARNING 04-06 18:18:22 cdf_sketch.py:163] Either download and install Chrome yourself following Google's instructions for your operating system,
+WARNING 04-06 18:18:22 cdf_sketch.py:163] or install it from your terminal by running:
+WARNING 04-06 18:18:22 cdf_sketch.py:163] 
+WARNING 04-06 18:18:22 cdf_sketch.py:163]     $ plotly_get_chrome
+WARNING 04-06 18:18:22 cdf_sketch.py:163] 
+WARNING 04-06 18:18:22 cdf_sketch.py:163] ); skipping PNG export
+INFO 04-06 18:18:22 cdf_sketch.py:71] batch_num_tokens: batch_num_tokens stats: min: 1, max: 122679, mean: 31495.393162393164, 25th percentile: 0.9989999999999999, median: 4084.6947163756145, 75th percentile: 61390.05774225867, 95th percentile: 110525.7020910304, 99th percentile: 118539.72249742507 99.9th percentile: 118777.03925918153 count: 117.0 sum: 3684961.0
+WARNING 04-06 18:18:22 cdf_sketch.py:163] Failed to write plot image /workspace/server-output/mistral-nemo-12b//plots//batch_num_tokens.png (
+WARNING 04-06 18:18:22 cdf_sketch.py:163] 
+WARNING 04-06 18:18:22 cdf_sketch.py:163] Kaleido requires Google Chrome to be installed.
+WARNING 04-06 18:18:22 cdf_sketch.py:163] 
+WARNING 04-06 18:18:22 cdf_sketch.py:163] Either download and install Chrome yourself following Google's instructions for your operating system,
+WARNING 04-06 18:18:22 cdf_sketch.py:163] or install it from your terminal by running:
+WARNING 04-06 18:18:22 cdf_sketch.py:163] 
+WARNING 04-06 18:18:22 cdf_sketch.py:163]     $ plotly_get_chrome
+WARNING 04-06 18:18:22 cdf_sketch.py:163] 
+WARNING 04-06 18:18:22 cdf_sketch.py:163] ); skipping PNG export
+INFO 04-06 18:18:22 cdf_sketch.py:71] batch_num_prefill_tokens: batch_num_prefill_tokens stats: min: 0, max: 122679, mean: 31494.897435897437, 25th percentile: 0, median: 4084.6947163756145, 75th percentile: 61390.05774225867, 95th percentile: 110525.7020910304, 99th percentile: 118539.72249742507 99.9th percentile: 118777.03925918153 count: 117.0 sum: 3684903.0
+WARNING 04-06 18:18:22 cdf_sketch.py:163] Failed to write plot image /workspace/server-output/mistral-nemo-12b//plots//batch_num_prefill_tokens.png (
+WARNING 04-06 18:18:22 cdf_sketch.py:163] 
+WARNING 04-06 18:18:22 cdf_sketch.py:163] Kaleido requires Google Chrome to be installed.
+WARNING 04-06 18:18:22 cdf_sketch.py:163] 
+WARNING 04-06 18:18:22 cdf_sketch.py:163] Either download and install Chrome yourself following Google's instructions for your operating system,
+WARNING 04-06 18:18:22 cdf_sketch.py:163] or install it from your terminal by running:
+WARNING 04-06 18:18:22 cdf_sketch.py:163] 
+WARNING 04-06 18:18:22 cdf_sketch.py:163]     $ plotly_get_chrome
+WARNING 04-06 18:18:22 cdf_sketch.py:163] 
+WARNING 04-06 18:18:22 cdf_sketch.py:163] ); skipping PNG export
+INFO 04-06 18:18:22 cdf_sketch.py:71] batch_num_decode_tokens: batch_num_decode_tokens stats: min: 0, max: 1, mean: 0.49572649572649574, 25th percentile: 0, median: 0, 75th percentile: 0.9989999999999999, 95th percentile: 0.9989999999999999, 99th percentile: 0.9989999999999999 99.9th percentile: 0.9989999999999999 count: 117.0 sum: 58.0
+WARNING 04-06 18:18:22 cdf_sketch.py:163] Failed to write plot image /workspace/server-output/mistral-nemo-12b//plots//batch_num_decode_tokens.png (
+WARNING 04-06 18:18:22 cdf_sketch.py:163] 
+WARNING 04-06 18:18:22 cdf_sketch.py:163] Kaleido requires Google Chrome to be installed.
+WARNING 04-06 18:18:22 cdf_sketch.py:163] 
+WARNING 04-06 18:18:22 cdf_sketch.py:163] Either download and install Chrome yourself following Google's instructions for your operating system,
+WARNING 04-06 18:18:22 cdf_sketch.py:163] or install it from your terminal by running:
+WARNING 04-06 18:18:22 cdf_sketch.py:163] 
+WARNING 04-06 18:18:22 cdf_sketch.py:163]     $ plotly_get_chrome
+WARNING 04-06 18:18:22 cdf_sketch.py:163] 
+WARNING 04-06 18:18:22 cdf_sketch.py:163] ); skipping PNG export
+INFO 04-06 18:18:22 cdf_sketch.py:71] batch_size: batch_size stats: min: 1, max: 1, mean: 1.0, 25th percentile: 0.9989999999999999, median: 0.9989999999999999, 75th percentile: 0.9989999999999999, 95th percentile: 0.9989999999999999, 99th percentile: 0.9989999999999999 99.9th percentile: 0.9989999999999999 count: 117.0 sum: 117.0
+WARNING 04-06 18:18:22 cdf_sketch.py:163] Failed to write plot image /workspace/server-output/mistral-nemo-12b//plots//batch_size.png (
+WARNING 04-06 18:18:22 cdf_sketch.py:163] 
+WARNING 04-06 18:18:22 cdf_sketch.py:163] Kaleido requires Google Chrome to be installed.
+WARNING 04-06 18:18:22 cdf_sketch.py:163] 
+WARNING 04-06 18:18:22 cdf_sketch.py:163] Either download and install Chrome yourself following Google's instructions for your operating system,
+WARNING 04-06 18:18:22 cdf_sketch.py:163] or install it from your terminal by running:
+WARNING 04-06 18:18:22 cdf_sketch.py:163] 
+WARNING 04-06 18:18:22 cdf_sketch.py:163]     $ plotly_get_chrome
+WARNING 04-06 18:18:22 cdf_sketch.py:163] 
+WARNING 04-06 18:18:22 cdf_sketch.py:163] ); skipping PNG export
+INFO 04-06 18:18:22 cdf_sketch.py:71] decode_token_execution_plus_preemption_time: decode_token_execution_plus_preemption_time stats: min: 0.0, max: 0.0, mean: 0.0, 25th percentile: 0, median: 0, 75th percentile: 0, 95th percentile: 0, 99th percentile: 0 99.9th percentile: 0 count: 117.0 sum: 0.0
+WARNING 04-06 18:18:22 cdf_sketch.py:163] Failed to write plot image /workspace/server-output/mistral-nemo-12b//plots//decode_token_execution_plus_preemption_time.png (
+WARNING 04-06 18:18:22 cdf_sketch.py:163] 
+WARNING 04-06 18:18:22 cdf_sketch.py:163] Kaleido requires Google Chrome to be installed.
+WARNING 04-06 18:18:22 cdf_sketch.py:163] 
+WARNING 04-06 18:18:22 cdf_sketch.py:163] Either download and install Chrome yourself following Google's instructions for your operating system,
+WARNING 04-06 18:18:22 cdf_sketch.py:163] or install it from your terminal by running:
+WARNING 04-06 18:18:22 cdf_sketch.py:163] 
+WARNING 04-06 18:18:22 cdf_sketch.py:163]     $ plotly_get_chrome
+WARNING 04-06 18:18:22 cdf_sketch.py:163] 
+WARNING 04-06 18:18:22 cdf_sketch.py:163] ); skipping PNG export
+INFO 04-06 18:18:22 data_series.py:124] request_arrival_time_series: request_arrival stats: min: 1, max: 59, mean: 30.0,
+WARNING 04-06 18:18:22 data_series.py:231] Failed to write plot image /workspace/server-output/mistral-nemo-12b//plots//request_arrival_time_series.png (
+WARNING 04-06 18:18:22 data_series.py:231] 
+WARNING 04-06 18:18:22 data_series.py:231] Kaleido requires Google Chrome to be installed.
+WARNING 04-06 18:18:22 data_series.py:231] 
+WARNING 04-06 18:18:22 data_series.py:231] Either download and install Chrome yourself following Google's instructions for your operating system,
+WARNING 04-06 18:18:22 data_series.py:231] or install it from your terminal by running:
+WARNING 04-06 18:18:22 data_series.py:231] 
+WARNING 04-06 18:18:22 data_series.py:231]     $ plotly_get_chrome
+WARNING 04-06 18:18:22 data_series.py:231] 
+WARNING 04-06 18:18:22 data_series.py:231] ); skipping PNG export
+INFO 04-06 18:18:22 data_series.py:124] request_completion_time_series: request_completion stats: min: 1, max: 58, mean: 29.5,
+WARNING 04-06 18:18:22 data_series.py:231] Failed to write plot image /workspace/server-output/mistral-nemo-12b//plots//request_completion_time_series.png (
+WARNING 04-06 18:18:22 data_series.py:231] 
+WARNING 04-06 18:18:22 data_series.py:231] Kaleido requires Google Chrome to be installed.
+WARNING 04-06 18:18:22 data_series.py:231] 
+WARNING 04-06 18:18:22 data_series.py:231] Either download and install Chrome yourself following Google's instructions for your operating system,
+WARNING 04-06 18:18:22 data_series.py:231] or install it from your terminal by running:
+WARNING 04-06 18:18:22 data_series.py:231] 
+WARNING 04-06 18:18:22 data_series.py:231]     $ plotly_get_chrome
+WARNING 04-06 18:18:22 data_series.py:231] 
+WARNING 04-06 18:18:22 data_series.py:231] ); skipping PNG export
+INFO 04-06 18:18:22 data_series.py:124] prefill_completion_time_series: prefill_completion stats: min: 4085, max: 3562224, mean: 1238657.7931034483,
+WARNING 04-06 18:18:22 data_series.py:231] Failed to write plot image /workspace/server-output/mistral-nemo-12b//plots//prefill_completion_time_series.png (
+WARNING 04-06 18:18:22 data_series.py:231] 
+WARNING 04-06 18:18:22 data_series.py:231] Kaleido requires Google Chrome to be installed.
+WARNING 04-06 18:18:22 data_series.py:231] 
+WARNING 04-06 18:18:22 data_series.py:231] Either download and install Chrome yourself following Google's instructions for your operating system,
+WARNING 04-06 18:18:22 data_series.py:231] or install it from your terminal by running:
+WARNING 04-06 18:18:22 data_series.py:231] 
+WARNING 04-06 18:18:22 data_series.py:231]     $ plotly_get_chrome
+WARNING 04-06 18:18:22 data_series.py:231] 
+WARNING 04-06 18:18:22 data_series.py:231] ); skipping PNG export
+INFO:     Application shutdown complete.
+INFO:     Finished server process [22505]
+[36m(RayWorker pid=22898)[0m [vAttention ALLOC] reqId: 0 | blocks: 1 | sync: false[32m [repeated 3x across cluster][0m
+[36m(pid=22908)[0m [2026-04-06 17:24:30,659 E 22908 26264] core_worker_process.cc:842: Failed to establish connection to the metrics exporter agent. Metrics will not be exported. Exporter agent status: RpcError: Running out of retries to initialize the metrics agent. rpc_code: 14[32m [repeated 47x across cluster][0m
+Future exception was never retrieved
+future: <Future finished exception=TimeoutError()>
+Traceback (most recent call last):
+  File "/workspace/sarathi-lean/sarathi/engine/async_llm_engine.py", line 350, in engine_step
+    request_outputs = await self.engine.step_async()
+  File "/workspace/sarathi-lean/sarathi/engine/async_llm_engine.py", line 238, in step_async
+    return await asyncio.get_event_loop().run_in_executor(None, self.engine.step)
+asyncio.exceptions.CancelledError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/lib/python3.10/asyncio/tasks.py", line 456, in wait_for
+    return fut.result()
+asyncio.exceptions.CancelledError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/dist-packages/uvicorn/protocols/http/h11_impl.py", line 410, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+  File "/usr/local/lib/python3.10/dist-packages/uvicorn/middleware/proxy_headers.py", line 60, in __call__
+    return await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/dist-packages/fastapi/applications.py", line 1134, in __call__
+    await super().__call__(scope, receive, send)
+  File "/usr/local/lib/python3.10/dist-packages/starlette/applications.py", line 107, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/usr/local/lib/python3.10/dist-packages/starlette/middleware/errors.py", line 186, in __call__
+    raise exc
+  File "/usr/local/lib/python3.10/dist-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/usr/local/lib/python3.10/dist-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/usr/local/lib/python3.10/dist-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/usr/local/lib/python3.10/dist-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/usr/local/lib/python3.10/dist-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/dist-packages/starlette/routing.py", line 716, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/usr/local/lib/python3.10/dist-packages/starlette/routing.py", line 736, in app
+    await route.handle(scope, receive, send)
+  File "/usr/local/lib/python3.10/dist-packages/starlette/routing.py", line 290, in handle
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.10/dist-packages/fastapi/routing.py", line 119, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/usr/local/lib/python3.10/dist-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/usr/local/lib/python3.10/dist-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/usr/local/lib/python3.10/dist-packages/fastapi/routing.py", line 105, in app
+    response = await f(request)
+  File "/usr/local/lib/python3.10/dist-packages/fastapi/routing.py", line 424, in app
+    raw_response = await run_endpoint_function(
+  File "/usr/local/lib/python3.10/dist-packages/fastapi/routing.py", line 312, in run_endpoint_function
+    return await dependant.call(**values)
+  File "/workspace/sarathi-lean/sarathi/entrypoints/openai_server/api_server.py", line 92, in create_completion
+    generator = await openai_serving_completion.create_completion(request, raw_request)
+  File "/workspace/sarathi-lean/sarathi/entrypoints/openai_server/serving_completion.py", line 122, in create_completion
+    async for i, res in result_generator:
+  File "/workspace/sarathi-lean/sarathi/utils/__init__.py", line 117, in consumer
+    raise e
+  File "/workspace/sarathi-lean/sarathi/utils/__init__.py", line 108, in consumer
+    raise item
+  File "/workspace/sarathi-lean/sarathi/utils/__init__.py", line 92, in producer
+    async for item in iterator:
+  File "/workspace/sarathi-lean/sarathi/engine/async_llm_engine.py", line 474, in generate
+    async for output in self._process_request(
+  File "/workspace/sarathi-lean/sarathi/engine/async_llm_engine.py", line 505, in _process_request
+    raise e
+  File "/workspace/sarathi-lean/sarathi/engine/async_llm_engine.py", line 501, in _process_request
+    async for request_output in stream:
+  File "/workspace/sarathi-lean/sarathi/engine/async_llm_engine.py", line 56, in __anext__
+    raise result
+  File "/workspace/sarathi-lean/sarathi/engine/async_llm_engine.py", line 188, in _log_task_completion
+    return_value = task.result()
+  File "/workspace/sarathi-lean/sarathi/engine/async_llm_engine.py", line 370, in run_engine_loop
+    await asyncio.wait_for(self.engine_step(), ENGINE_ITERATION_TIMEOUT_S)
+  File "/usr/lib/python3.10/asyncio/tasks.py", line 458, in wait_for
+    raise exceptions.TimeoutError() from exc
+asyncio.exceptions.TimeoutError
