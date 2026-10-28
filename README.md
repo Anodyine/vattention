@@ -5,13 +5,15 @@ vAttention is a memory manager for KV-cache in LLM serving systems. It decouples
 
 # Content
 
-This repository contains an implementation of vAttention, intergrated with an LLM serving system Sarathi-Serve that was published in OSDI'24 ([paper](https://www.usenix.org/conference/osdi24/presentation/agrawal), [code](https://github.com/microsoft/sarathi-serve)). The content is organized as follows:
+This repository contains an implementation of vAttention, integrated with the LLM serving system Sarathi-Serve that was published in OSDI'24 ([paper](https://www.usenix.org/conference/osdi24/presentation/agrawal), [code](https://github.com/microsoft/sarathi-serve)). The content is organized as follows:
 
  * `vattention` contains the source code of vattention memory allocator
  * `sarathi-lean` modified version of Sarathi-Serve with support for both PagedAttention and vAttention style of memory management
  * `scripts` contains scripts to run the experiments
  * `nvidia-vattn-uvm-driver` contains our modified version of the NVIDIA UVM drivers
  * `microbenchmarks` contains scripts to run some useful microbenchmarks
+ * `docs` contains the fragmentation study, verification guide, and setup notes
+ * `server_plots` contains checked-in plots and summaries from the fragmentation runs
 
 
 # Installation and Dependencies
@@ -48,18 +50,18 @@ The repo provides a benchmark-runner which can be used to run different workload
 
 This repository includes two customizable benchmark scripts:
 
-* [benchmark_e2e_dynamic_trace.py](scripts/benchmark_e2e_dynamic_trace.py): This script runs expriments on a dynamic trace. It runs 256 requests from the **_arxive dataset_** for qps of 0.4, 0.8, 1, 2, 4 and 6 where requests arrive as per the poisson distribution.
+* [benchmark_e2e_dynamic_trace.py](scripts/benchmark_e2e_dynamic_trace.py): This script runs experiments on a dynamic trace. It runs 256 requests from the **arXiv dataset** for qps of 0.4, 0.8, 1, 2, 4 and 6 where requests arrive according to a Poisson distribution.
 * [benchmark_e2e_static_trace.py](scripts/benchmark_e2e_static_trace.py): This script runs experiments on a static trace and can be used to reproduce the makespan results of our paper. It runs 50 requests for context length 32k, 64k and 128k and prefill to decode ratios of 500, 100 and 50.
 
 ```sh
 # testing the setup:
 python scripts/benchmark_e2e_static_trace.py --test
-or 
+# or
 python scripts/benchmark_e2e_dynamic_trace.py --test
 
 # run benchmarks for performance evaluation:
 python scripts/benchmark_e2e_static_trace.py
-or
+# or
 python scripts/benchmark_e2e_dynamic_trace.py
 ```
 
@@ -67,14 +69,14 @@ Benchmark results are redirected to `experiments/e2e_static_eval` or `experiment
 
 ```sh
 python scripts/process_e2e_static.py
-or
+# or
 python scripts/process_e2e_dynamic.py
 ```
 
 
 ### Configuring attention backends
 
-We have modified Sarathi-Serve to support [FlashAttention]((https://github.com/Dao-AILab/flash-attention)) and [FlashInfer](https://github.com/flashinfer-ai/flashinfer) backends for attention computation.
+We have modified Sarathi-Serve to support [FlashAttention](https://github.com/Dao-AILab/flash-attention) and [FlashInfer](https://github.com/flashinfer-ai/flashinfer) backends for attention computation.
 
 * [vattention_flashattention_wrapper.py](sarathi-lean/sarathi/model_executor/attention/vattention_flashattention_wrapper.py) This backend uses FlashAttention's `flash_attn_with_kvcache` API for both prefill and decode attention computation.
 * [vattention_flashinfer_wrapper.py](sarathi-lean/sarathi/model_executor/attention/vattention_flashinfer_wrapper.py) This experimental backend demonstrates the portability of vAttention approach. It uses FlashInfer's `flashinfer.prefill.single_prefill_with_kv_cache` API for (non-paged) prefill and FlashAttention's `flash_attn_with_kvcache` API for (non-paged) decode.
@@ -111,7 +113,7 @@ export OPENAI_API_KEY=secret_abcdefg
 export OPENAI_API_BASE=http://localhost:8000/v1
 
 # running a static trace
- python -m metron.run_benchmark \
+python -m metron.run_benchmark \
 --model "01-ai/Yi-6B-200k" \
 --max-num-completed-requests 150 \
 --timeout 600 \
@@ -120,9 +122,9 @@ export OPENAI_API_BASE=http://localhost:8000/v1
 --output-dir "experiments" \
 --request-interval-generator-provider "static" \
 --request-length-generator-provider "fixed" \
---fixed-request-generator-prefill-tokens 65536 \ 
+--fixed-request-generator-prefill-tokens 65536 \
 --fixed-request-generator-decode-tokens 128 \
---request-generator-max-tokens 65536 \
+--request-generator-max-tokens 65536
 
 # running a dynamic trace
 python -m metron.run_benchmark \
@@ -136,7 +138,7 @@ python -m metron.run_benchmark \
 --poisson-request-interval-generator-qps 0.5 \
 --request-length-generator-provider "trace" \
 --trace-request-length-generator-trace-file "sarathi-lean/data/processed_traces/arxiv_summarization_filtered_stats_llama2_tokenizer.csv" \
---request-generator-max-tokens 8192 \
+--request-generator-max-tokens 8192
 ```
 
 The results would be redirected to `experiments` directory. You can learn more about customising the benchmarks you run here: [project metron](https://project-metron.readthedocs.io/en/latest/).
@@ -161,7 +163,7 @@ vAttention exports a set of simple APIs that a serving system can use for KV-cac
         )
     ```
 
-    which returns **virtual** PyTorch tensors without any physical memory mapped underneath. The serving system can also reserve physical memory for KV-cache ahead-of-time as follows:
+    This is the dense-KV initialization path. MLA models use a component-spec initialization path for their latent KV and RoPE key components. Both paths return **virtual** PyTorch tensors without physical memory mapped underneath. The serving system can also reserve physical memory for KV-cache ahead-of-time as follows:
 
     ```sh
     vattention.reserve_physical_pages(cache_config.memory_for_gpu)
@@ -208,3 +210,9 @@ If you use our work, please consider citing our paper:
 ## Acknowledgment
 
 This repository originally started as a fork of [Sarathi-Serve](https://github.com/microsoft/sarathi-serve) which in turn is a fork of the [vLLM project](https://vllm-project.github.io/). vAttention and Sarathi-Serve are research prototypes and do not have complete feature parity with open-source vLLM. We have only retained the most critical features and adopted the codebase for faster research iterations.
+
+## Additions for the fragmentation study
+
+The additions include MHA model setup for **Qwen-14B** and serving configurations for **GQA** (Mistral-Nemo-12B) and **MLA** (DeepSeek-V2-Lite). MLA-aware cache geometry and allocator initialization were added, along with a synthetic Mistral MLA conversion for a comparison against GQA on the same backbone. The synthetic conversion is intended for cache-layout experiments, not model-quality evaluation.
+
+Per-request metrics record mapped KV blocks and tail-waste fragmentation. The [context-length sweep](scripts/fragmentation_context_sweep.py) sends exact token counts, and the [pipeline](scripts/run_fragmentation_pipeline.sh) collects metrics and generates measured and analytical plots. Running the allocator with different block or page sizes shows how much unused space remains in the last mapped block of each request. The checked-in multi-model study uses **2 MB pages**; smaller vAttention pages require the custom driver described above. See the [verification guide](docs/grader-verification-guide.md) and [final report](docs/final_report.pdf) for commands and results.
